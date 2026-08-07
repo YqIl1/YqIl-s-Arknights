@@ -1,0 +1,52 @@
+{
+  "ambiguous_morality": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:ambiguous_morality",
+        "stream": true
+      }
+    ]
+  },
+  "mlynar_power": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:mlynar_power"
+      }
+    ]
+  },
+  "lappland_blade_ranged": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:lappland_blade_ranged"
+      }
+    ]
+  },
+  "lappland_blade_melee": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:lappland_blade_melee"
+      }
+    ]
+  },
+  "lappland_blade_power": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:lappland_blade_power"
+      }
+    ]
+  },
+  "lappland_blade_power_melee": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:lappland_blade_power_melee"
+      }
+    ]
+  },
+  "lappland_blade_power_ranged": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:lappland_blade_power_ranged"
+      }
+    ]
+  }
+}

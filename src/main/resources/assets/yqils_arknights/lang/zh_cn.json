@@ -1,0 +1,38 @@
+{
+
+  "item.yqils_arknights.lappland_blade_projectile": "拉普兰德武器投掷物",
+  "entity.yqils_arknights.lappland_blade_projectile": "拉普兰德武器投掷物",
+
+  "block.yqils_arknights.weapon_forging_station": "武器锻造站",
+  "block.yqils_arknights.weapon_forging_station.description": "可以在此处锻造武器",
+
+  "itemGroup.yqils_arknights.yqils_arknights_tab": "YqIl的明日方舟",
+
+  "effect.yqils_arknights.fragile": "脆弱",
+  "effect.yqils_arknights.fragile.description": "承受任意来源的伤害提升10%，每级额外提升10%",
+
+
+  "item.yqils_arknights.lappland_blade": "幼狼的牙齿",
+  "item.yqils_arknights.lappland_blade.jei_info": "拉普兰德的标志性武器",
+  "item.yqils_arknights.lappland_blade.description": "击中附带 脆弱I 8秒，右键可进行80%伤害的远程攻击\n17次攻击后触发狼魂",
+
+
+  "item.yqils_arknights.ambiguous_morality_music_disc": "Ambiguous Morality",
+  "item.yqils_arknights.ambiguous_morality_music_disc.desc": "Ambiguous Morality - Monster Siren Records",
+
+  "item.yqils_arknights.gear_base": "装备基底",
+  "item.yqils_arknights.gear_base.description": "大多数装备的基底，可以在武器锻造站里锻造为不同武器",
+
+  "gui.yqils_arknights.weapon_forging_station.start": "开始",
+
+
+  "item.yqils_arknights.mlynar_newspaper": "报纸",
+  "item.yqils_arknights.mlynar_newspaper.jei_info": "玛恩纳的报纸",
+  "item.yqils_arknights.mlynar_newspaper.description": "右键使用获得30秒的未照耀的荣光, 40秒冷却",
+
+  "effect.yqils_arknights.mlynar_power": "未照耀的荣光",
+  "effect.yqils_arknights.mlynar_power.description": "获得11伤害和2距离",
+
+  "effect.yqils_arknights.lapplad_blade_power": "狼魂",
+  "effect.yqils_arknights.lapplad_blade_power.description": "攻击力+120%，远程攻击额外发射一个投掷物，远程攻击不再降低攻击力"
+}
