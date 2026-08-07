@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "yqils_arknights:block/weapon_forging_station_base",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "yqils_arknights:block/weapon_forging_station_base"
+    },
+    "facing=south": {
+      "model": "yqils_arknights:block/weapon_forging_station_base",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "yqils_arknights:block/weapon_forging_station_base",
+      "y": 270
+    }
+  }
+}

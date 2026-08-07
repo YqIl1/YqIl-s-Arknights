@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "yqils_arknights:item/ambiguous_morality_music_disc"
+  }
+}

@@ -1,0 +1,41 @@
+{
+
+  "item.yqils_arknights.lappland_blade_projectile": "Lappland blade projectile",
+  "entity.yqils_arknights.lappland_blade_projectile": "Lappland blade projectile",
+
+  "block.yqils_arknights.weapon_forging_station": "Weapon Forging Station",
+  "block.yqils_arknights.weapon_forging_station.description": "Allow player to forge Gear Base to different gears",
+
+  "itemGroup.yqils_arknights.yqils_arknights_tab": "YqIl's Arknights",
+
+  "effect.yqils_arknights.fragile": "Fragile",
+  "effect.yqils_arknights.fragile.description": "Takes 10% more damage from all sources, increase by 10% per level",
+
+
+
+
+  "item.yqils_arknights.lappland_blade": "The Young Fang",
+  "item.yqils_arknights.lappland_blade.jei_info": "Lappland's iconic blade",
+  "item.yqils_arknights.lappland_blade.description": "On hit apply Fragile I for 8 seconds. Right click to launch ranged attack at 80% of ATK\nTrigger Wolf Spirit after 17 attacks",
+
+
+  "item.yqils_arknights.ambiguous_morality_music_disc": "Ambiguous Morality",
+  "item.yqils_arknights.ambiguous_morality_music_disc.desc": "Ambiguous Morality - Monster Siren Records",
+
+  "item.yqils_arknights.gear_base": "Gear Base",
+  "item.yqils_arknights.gear_base.description": "This is the base of most gear, can be forged into different gears in the Weapon Forging Station",
+
+  "gui.yqils_arknights.weapon_forging_station.start": "Start",
+
+
+  "item.yqils_arknights.mlynar_newspaper": "Newspaper",
+  "item.yqils_arknights.mlynar_newspaper.jei_info": "Mlynar's Newspaper",
+  "item.yqils_arknights.mlynar_newspaper.description": "On right click grant Unbrilliant Glory for 30s, has 40s colddown after the effect ends",
+
+  "effect.yqils_arknights.mlynar_power": "Unbrilliant Glory",
+  "effect.yqils_arknights.mlynar_power.description": "Gain 11 attack damage and 2 reach distance",
+
+  "effect.yqils_arknights.lapplad_blade_power": "Wolf Spirit",
+  "effect.yqils_arknights.lapplad_blade_power.description": "ATK +120%; Ranged Attacks create 1 extra projectile; The damage reduction of Ranged Attacks is removed"
+
+}
