@@ -4,6 +4,8 @@ import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.entity.ModEntities;
 import com.YqIl1.yqils_arknights.item.ModItems;
 import com.YqIl1.yqils_arknights.item.custom.LapplandBladeItem;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -46,6 +48,7 @@ public class LapplandBladeProjectile extends ThrowableItemProjectile {
     @Override
     public void tick() {
         super.tick();
+        level().addParticle(ParticleTypes.ASH, this.getX(), this.getY(), this.getZ(), 0.0D, 0.0D, 0.0D);
         // tickCount is Entity's own built-in age counter, incremented automatically every tick -- despawn
         // as a safety net in case it never hits anything (e.g. flies off into the void)
         if (!this.level().isClientSide && this.tickCount >= MAX_LIFETIME_TICKS) {

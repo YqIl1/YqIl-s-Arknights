@@ -23,19 +23,24 @@
   "item.yqils_arknights.ambiguous_morality_music_disc.desc": "Ambiguous Morality - Monster Siren Records",
 
   "item.yqils_arknights.gear_base": "Gear Base",
-  "item.yqils_arknights.gear_base.description": "This is the base of most gear, can be forged into different gears in the Weapon Forging Station",
+  "item.yqils_arknights.gear_base.description": "This is the base of most equipment, can be forged into different equipments in the Weapon Forging Station",
 
   "gui.yqils_arknights.weapon_forging_station.start": "Start",
 
 
   "item.yqils_arknights.mlynar_newspaper": "Newspaper",
   "item.yqils_arknights.mlynar_newspaper.jei_info": "Mlynar's Newspaper",
-  "item.yqils_arknights.mlynar_newspaper.description": "On right click grant Unbrilliant Glory for 30s, has 40s colddown after the effect ends",
+  "item.yqils_arknights.mlynar_newspaper.description": "Right click grants Unbrilliant Glory for 30s, has 40s cooldown after the effect ends",
 
   "effect.yqils_arknights.mlynar_power": "Unbrilliant Glory",
   "effect.yqils_arknights.mlynar_power.description": "Gain 11 attack damage and 2 reach distance",
 
   "effect.yqils_arknights.lapplad_blade_power": "Wolf Spirit",
-  "effect.yqils_arknights.lapplad_blade_power.description": "ATK +120%; Ranged Attacks create 1 extra projectile; The damage reduction of Ranged Attacks is removed"
+  "effect.yqils_arknights.lapplad_blade_power.description": "ATK +120%; Ranged Attacks create 1 extra projectile; The damage reduction of Ranged Attacks is removed",
 
+  "item.yqils_arknights.eyjafjalla_wand": "Eyjafjalla's Originium Arts Casting Staff",
+  "item.yqils_arknights.eyjafjalla_wand.decription": "Right click to shoot a projectile \nOn shift right click activates Volcano for 15s",
+
+  "effect.yqils_arknights.eyjafjalla_wand_power": "Volcano",
+  "effect.yqils_arknights.eyjafjalla_wand_power.description": "ATK +130%; Range increase; Attack Interval reduce by 1.1 seconds; Ranged Attacks create 5 extra projectile in random directions"
 }

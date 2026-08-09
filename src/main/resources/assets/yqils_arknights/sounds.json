@@ -48,5 +48,19 @@
         "name": "yqils_arknights:lappland_blade_power_ranged"
       }
     ]
+  },
+  "eyjafjalla_wand_ranged": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:eyjafjalla_wand_ranged"
+      }
+    ]
+  },
+  "eyjafjalla_wand_power": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:eyjafjalla_wand_power"
+      }
+    ]
   }
 }

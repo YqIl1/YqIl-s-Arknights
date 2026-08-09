@@ -19,27 +19,29 @@ public class LapplandHitCounterOverlay implements IGuiOverlay {
             return;
         }
 
-        ItemStack stack = getHeldLapplandBlade(player);
-        if (stack.isEmpty()) {
+        ItemStack mainHand = player.getMainHandItem();
+        ItemStack offHand = player.getOffhandItem();
+        ItemStack stack;
+        boolean offhand;
+        if (mainHand.getItem() instanceof LapplandBladeItem) {
+            stack = mainHand;
+            offhand = false;
+        } else if (offHand.getItem() instanceof LapplandBladeItem) {
+            stack = offHand;
+            offhand = true;
+        } else {
             return;
         }
 
         String text = LapplandBladeItem.getHitCount(stack) + "/" + LapplandBladeItem.POWER_THRESHOLD;
-        int x = screenWidth / 2 + OFFSET_X;
         int y = screenHeight / 2 + OFFSET_Y;
+        int x;
+        if (offhand) {
+            x = screenWidth / 2 - OFFSET_X - Minecraft.getInstance().font.width(text);
+        } else {
+            x = screenWidth / 2 + OFFSET_X;
+        }
 
         guiGraphics.drawString(Minecraft.getInstance().font, text, x, y, 0xFFFFFF);
-    }
-
-    private static ItemStack getHeldLapplandBlade(Player player) {
-        ItemStack mainHand = player.getMainHandItem();
-        if (mainHand.getItem() instanceof LapplandBladeItem) {
-            return mainHand;
-        }
-        ItemStack offHand = player.getOffhandItem();
-        if (offHand.getItem() instanceof LapplandBladeItem) {
-            return offHand;
-        }
-        return ItemStack.EMPTY;
     }
 }

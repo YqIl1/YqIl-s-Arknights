@@ -1,5 +1,8 @@
-// 1.20.1	2026-08-05T07:49:56.861387	Recipes
+// 1.20.1	2026-08-09T17:05:28.524852	Recipes
+847e715e1cb7890e5542055afc08b7b31e221ca5 data/yqils_arknights/advancements/recipes/misc/gear_base.json
 6ad40861626de92f168fc368f63789b6c801783b data/yqils_arknights/advancements/recipes/misc/weapon_forging_station.json
+7d8889b5b98d04469e560f0a0e4afdbb50d07394 data/yqils_arknights/recipes/eyjafjala_wand_from_forging.json
+8b36d31dd14a7c03628c758ccedcd9dd0acd3e76 data/yqils_arknights/recipes/gear_base.json
 f1b0d5fd8ca5a13f30f10b85130bf820cd8c5744 data/yqils_arknights/recipes/lappland_blade_from_weapon_forging.json
 99a8bdbb34fe04509002bab8761cb22a2b0ff009 data/yqils_arknights/recipes/mlynar_newspaper_weapon_from_forging.json
 b3f65f1e747ffb247f77cf0db3cb97f7b3415f75 data/yqils_arknights/recipes/weapon_forging_station.json
