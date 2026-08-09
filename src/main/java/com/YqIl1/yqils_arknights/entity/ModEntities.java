@@ -1,6 +1,7 @@
 package com.YqIl1.yqils_arknights.entity;
 
 import com.YqIl1.yqils_arknights.Yqils_arknights;
+import com.YqIl1.yqils_arknights.entity.custom.EyjafjallaWandProjectile;
 import com.YqIl1.yqils_arknights.entity.custom.LapplandBladeProjectile;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -18,4 +19,13 @@ public class ModEntities {
                     .clientTrackingRange(4)
                     .updateInterval(10)
                     .build("lappland_blade_projectile"));
+
+    public static final RegistryObject<EntityType<EyjafjallaWandProjectile>> EYJAFJALLA_WAND_PROJECTILE = ENTITY_TYPES.register("eyjafjalla_wand_projectile",
+            () -> EntityType.Builder.<EyjafjallaWandProjectile>of(EyjafjallaWandProjectile::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build("eyjafjalla_wand_projectile"));
+
 }
+

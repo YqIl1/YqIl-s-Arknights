@@ -34,5 +34,11 @@
   "effect.yqils_arknights.mlynar_power.description": "获得11伤害和2距离",
 
   "effect.yqils_arknights.lapplad_blade_power": "狼魂",
-  "effect.yqils_arknights.lapplad_blade_power.description": "攻击力+120%，远程攻击额外发射一个投掷物，远程攻击不再降低攻击力"
+  "effect.yqils_arknights.lapplad_blade_power.description": "攻击力+120%，远程攻击额外发射一个投掷物，远程攻击不再降低攻击力",
+
+  "item.yqils_arknights.eyjafjalla_wand": "艾雅法拉的源石施术单元",
+  "item.yqils_arknights.eyjafjalla_wand.decription": "右键进行远程攻击\n下蹲右键开启火山，持续15秒",
+
+  "effect.yqils_arknights.eyjafjalla_wand_power": "火山",
+  "effect.yqils_arknights.eyjafjalla_wand_power.description": "攻击力+130%; 距离提升; 攻击间隔缩短1.1秒; 远程攻击额外创造5发随机方向的投掷物"
 }

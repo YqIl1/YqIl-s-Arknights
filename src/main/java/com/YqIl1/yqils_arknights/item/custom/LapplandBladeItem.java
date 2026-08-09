@@ -33,7 +33,7 @@ public class LapplandBladeItem extends SwordItem {
         if (!target.level().isClientSide) {
             target.addEffect(new MobEffectInstance(ModEffects.FRAGILE.get(), 160, 0));
 
-            SoundEvent meleeSound = attacker.hasEffect(ModEffects.LAPPLAD_BLADE_POWER.get())
+            SoundEvent meleeSound = attacker.hasEffect(ModEffects.LAPPLAND_BLADE_POWER.get())
                     ? ModSound.LAPPLAND_BLADE_POWER_MELEE.get()
                     : ModSound.LAPPLAND_BLADE_MELEE.get();
             attacker.level().playSound(null, attacker.getX(), attacker.getY(), attacker.getZ(),
@@ -55,26 +55,22 @@ public class LapplandBladeItem extends SwordItem {
         ItemStack stack = player.getItemInHand(hand);
 
         if (!level.isClientSide) {
-            LapplandBladeProjectile projectile = new LapplandBladeProjectile(level, player);
             // Ranged attacks are normally reduced to 80% of melee damage, but that reduction is waived
             // while Lappland's Power is active
             float rangedDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
-            if (!player.hasEffect(ModEffects.LAPPLAD_BLADE_POWER.get())) {
+            boolean hasPower = player.hasEffect(ModEffects.LAPPLAND_BLADE_POWER.get());
+            if (!hasPower) {
                 rangedDamage *= 0.8F;
             }
-            projectile.setDamage(rangedDamage);
-            projectile.shootFromRotation(player, player.getXRot()-2, player.getYRot(), 0.0F, 1.5F, 1.0F);
-            level.addFreshEntity(projectile);
-            if (player.hasEffect(ModEffects.LAPPLAD_BLADE_POWER.get())) {
 
-                LapplandBladeProjectile powerProjectile = new LapplandBladeProjectile(level, player);
-                powerProjectile.setDamage(rangedDamage);
-                powerProjectile.shootFromRotation(player, player.getXRot()-3, player.getYRot()+3-(float)Math.random()*6, 0.0F, 1.5F, 1.0F);
-                level.addFreshEntity(powerProjectile);
+            fireProjectile(level,player,rangedDamage,2,0);
+            // shoot extra 1 projectile when have effect
+            if (hasPower) {
+                fireProjectile(level,player,rangedDamage,3-(float)(Math.random()*0.5),3-(float)Math.random()*6);
             }
             stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
 
-            SoundEvent rangedSound = player.hasEffect(ModEffects.LAPPLAD_BLADE_POWER.get())
+            SoundEvent rangedSound = hasPower
                     ? ModSound.LAPPLAND_BLADE_POWER_RANGED.get()
                     : ModSound.LAPPLAND_BLADE_RANGED.get();
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -95,7 +91,7 @@ public class LapplandBladeItem extends SwordItem {
         if (!(stack.getItem() instanceof LapplandBladeItem)) {
             return;
         }
-        if (attacker.hasEffect(ModEffects.LAPPLAD_BLADE_POWER.get())) {
+        if (attacker.hasEffect(ModEffects.LAPPLAND_BLADE_POWER.get())) {
             return;
         }
 
@@ -106,10 +102,18 @@ public class LapplandBladeItem extends SwordItem {
             count = 0;
             attacker.level().playSound(null, attacker.getX(), attacker.getY(), attacker.getZ(),
                     ModSound.LAPPLAND_BLADE_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-            attacker.addEffect(new MobEffectInstance(ModEffects.LAPPLAD_BLADE_POWER.get(), POWER_EFFECT_DURATION_TICKS, 0));
+            attacker.addEffect(new MobEffectInstance(ModEffects.LAPPLAND_BLADE_POWER.get(), POWER_EFFECT_DURATION_TICKS, 0));
         }
 
         tag.putInt(HIT_COUNTER_KEY, count);
+    }
+
+    private LapplandBladeProjectile fireProjectile(Level level, Player player, float dmg, float xOffset, float yOffset) {
+        LapplandBladeProjectile projectile = new LapplandBladeProjectile(level, player);
+        projectile.setDamage(dmg);
+        projectile.shootFromRotation(player, player.getXRot()-xOffset, player.getYRot()+yOffset, 0.0F, 1.5F, 1.0F);
+        level.addFreshEntity(projectile);
+        return projectile;
     }
 
     // Read-only; doesn't create a tag on the stack just from being queried (unlike getOrCreateTag)

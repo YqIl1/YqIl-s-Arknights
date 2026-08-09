@@ -31,6 +31,11 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         WeaponForgeRecipeBuilder.weaponForging(ModItems.MLYNAR_NEWSPAPER.get())
                 .save(pWriter, "mlynar_newspaper_weapon_from_forging");
 
+        WeaponForgeRecipeBuilder.weaponForging(ModItems.EYJAFJALLA_WAND.get())
+                .save(pWriter, "eyjafjala_wand_from_forging");
+
+
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WEAPON_FORGING_STATION_ITEM.get())
                 .pattern("BNB")
                 .pattern("BCB")
@@ -42,6 +47,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                 .save(pWriter);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GEAR_BASE.get())
+                .pattern("ICI")
+                .pattern("CGC")
+                .pattern("ICI")
+                .define('I', Items.IRON_INGOT)
+                .define('C', Items.COAL)
+                .define('G', Items.GOLD_INGOT)
+                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .save(pWriter);
 
 
     }

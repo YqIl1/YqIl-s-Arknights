@@ -3,10 +3,12 @@ package com.YqIl1.yqils_arknights.compat;
 import com.YqIl1.yqils_arknights.Yqils_arknights;
 import com.YqIl1.yqils_arknights.block.ModBlocks;
 import com.YqIl1.yqils_arknights.item.ModItems;
+import com.YqIl1.yqils_arknights.recipe.WeaponForgeRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
@@ -43,11 +45,18 @@ public class YqilsArknightsJeiPlugin implements IModPlugin {
 
         );
 
+        registration.addRecipes(WeaponForgingCatagory.RECIPE_TYPE,
+                recipeManager.getAllRecipesFor(WeaponForgeRecipe.Type.INSTANCE));
     }
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
-        IModPlugin.super.registerCategories(registration);
+        registration.addRecipeCategories(new WeaponForgingCatagory(registration.getJeiHelpers().getGuiHelper()));
+    }
+
+    @Override
+    public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        registration.addRecipeCatalyst(new ItemStack(ModItems.WEAPON_FORGING_STATION_ITEM.get()), WeaponForgingCatagory.RECIPE_TYPE);
     }
 
     @Override

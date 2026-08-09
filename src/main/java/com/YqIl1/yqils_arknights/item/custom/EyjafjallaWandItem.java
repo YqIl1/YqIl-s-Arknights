@@ -1,0 +1,124 @@
+package com.YqIl1.yqils_arknights.item.custom;
+
+import com.YqIl1.yqils_arknights.effect.ModEffects;
+import com.YqIl1.yqils_arknights.entity.custom.EyjafjallaWandProjectile;
+import com.YqIl1.yqils_arknights.sound.ModSound;
+import net.minecraft.client.renderer.EffectInstance;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
+public class EyjafjallaWandItem extends Item {
+    private static final String VOLCANO_LAST_USED_KEY = "yqils_arknights:volcano_last_used";
+    public static final int VOLCANO_COOLDOWN_TICKS = 1600; // 80s * 20 ticks/sec
+
+    public EyjafjallaWandItem(Properties p_41383_) {
+        super(p_41383_.rarity(Rarity.EPIC).stacksTo(1).durability(512));
+    }
+
+    @Override
+    public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> components, TooltipFlag p_41424_) {
+        components.add(Component.translatable("item.yqils_arknights.eyjafjalla_wand.decription"));
+        super.appendHoverText(p_41421_, p_41422_, components, p_41424_);
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
+        ItemStack itemstack = player.getItemInHand(interactionHand);
+        boolean hasPower = player.hasEffect(ModEffects.EYJAFJALLA_WAND_POWER.get());
+
+        int cooldown = 8;
+        if (!level.isClientSide) {
+            if (player.isShiftKeyDown()) {
+                CompoundTag tag = itemstack.getOrCreateTag();
+                long lastUsed = tag.getLong(VOLCANO_LAST_USED_KEY);
+                long elapsed = level.getGameTime() - lastUsed;
+
+                if (elapsed >= VOLCANO_COOLDOWN_TICKS) {
+                    player.addEffect(new MobEffectInstance(ModEffects.EYJAFJALLA_WAND_POWER.get(), 300, 0));
+                    tag.putLong(VOLCANO_LAST_USED_KEY, level.getGameTime());
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            ModSound.EYJAFJALLA_WAND_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                }
+            }
+            float rangedDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+
+            fireProjectile(level,player,rangedDamage,2,0,60);
+            if (hasPower) {
+                cooldown = 2;
+                for(int i = 0; i < 4; i++){
+                    fireProjectile(level,player,rangedDamage,3+(float)Math.random()*6,45-(float)Math.random()*90,90);
+                }
+            }
+
+            itemstack.hurtAndBreak(1, player, (entity) -> entity.broadcastBreakEvent(interactionHand));
+
+            level.playSound(null,player.getX(), player.getY(), player.getZ(),
+                    ModSound.EYJAFJALLA_WAND_RANGED.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+
+
+        }
+
+        player.getCooldowns().addCooldown(this, 2*cooldown);
+
+
+        return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slot, isSelected);
+        if (level.isClientSide || !(entity instanceof Player player)) {
+            return;
+        }
+        if (!player.hasEffect(ModEffects.EYJAFJALLA_WAND_POWER.get())) {
+            return;
+        }
+
+        CompoundTag tag = stack.getTag();
+        if (tag == null || !tag.contains(VOLCANO_LAST_USED_KEY)) {
+            return;
+        }
+
+        long lastUsed = tag.getLong(VOLCANO_LAST_USED_KEY);
+        long elapsed = level.getGameTime() - lastUsed;
+        if (elapsed < VOLCANO_COOLDOWN_TICKS) {
+            tag.putLong(VOLCANO_LAST_USED_KEY, lastUsed + 1);
+        }
+    }
+
+    public static final int VOLCANO_COOLDOWN_SECONDS = VOLCANO_COOLDOWN_TICKS / 20;
+
+    public static int getVolcanoElapsedSeconds(ItemStack stack, Level level) {
+        CompoundTag tag = stack.getTag();
+        if (tag == null) return VOLCANO_COOLDOWN_SECONDS;
+        long elapsedTicks = level.getGameTime() - tag.getLong(VOLCANO_LAST_USED_KEY);
+        long elapsedSeconds = elapsedTicks / 20;
+        return (int) Math.min(elapsedSeconds, VOLCANO_COOLDOWN_SECONDS);
+    }
+
+    private EyjafjallaWandProjectile fireProjectile(Level level, Player player, float dmg, float xOffset, float yOffset, int lifetime) {
+        EyjafjallaWandProjectile projectile = new EyjafjallaWandProjectile(level, player);
+        projectile.setMaxLifetime(lifetime);
+        projectile.setDamage(dmg+8);
+        projectile.shootFromRotation(player, player.getXRot()-xOffset, player.getYRot()+yOffset, 0.0F, 1.5F, 1.0F);
+        level.addFreshEntity(projectile);
+
+        return projectile;
+    }
+}

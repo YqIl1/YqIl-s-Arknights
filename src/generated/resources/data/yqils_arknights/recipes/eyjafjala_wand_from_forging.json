@@ -1,0 +1,11 @@
+{
+  "type": "yqils_arknights:weapon_forging",
+  "ingredients": [
+    {
+      "item": "yqils_arknights:gear_base"
+    }
+  ],
+  "output": {
+    "item": "yqils_arknights:eyjafjalla_wand"
+  }
+}

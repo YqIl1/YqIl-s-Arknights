@@ -1,8 +1,9 @@
 package com.YqIl1.yqils_arknights.effect;
 
 import com.YqIl1.yqils_arknights.Yqils_arknights;
+import com.YqIl1.yqils_arknights.effect.custom.EyjafjallaWandPowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.FragileEffect;
-import com.YqIl1.yqils_arknights.effect.custom.LapplandPowerEffect;
+import com.YqIl1.yqils_arknights.effect.custom.LapplandBladePowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.MlynarPowerEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -23,6 +24,12 @@ public class ModEffects {
             () -> new MlynarPowerEffect(MobEffectCategory.BENEFICIAL, 0xE3CF89));
 
     // +120% attack damage, granted when Lappland's Blade's hit counter reaches its threshold
-    public static final RegistryObject<MobEffect> LAPPLAD_BLADE_POWER = MOB_EFFECTS.register("lapplad_blade_power",
-            () -> new LapplandPowerEffect(MobEffectCategory.BENEFICIAL, 0xE84C4C));
+    public static final RegistryObject<MobEffect> LAPPLAND_BLADE_POWER = MOB_EFFECTS.register("lappland_blade_power",
+            () -> new LapplandBladePowerEffect(MobEffectCategory.BENEFICIAL, 0xE84C4C));
+
+    // ATK +130%; Range increases; Attack Interval reduces significantly; Attack becomes randomly shooting lava that can hit at most 6 enemies within range
+    public static final RegistryObject<MobEffect> EYJAFJALLA_WAND_POWER = MOB_EFFECTS.register("eyjafjalla_wand_power",
+            () -> new EyjafjallaWandPowerEffect(MobEffectCategory.BENEFICIAL, 0xED96A9));
+
+
 }

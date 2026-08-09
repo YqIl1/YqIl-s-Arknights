@@ -2,13 +2,13 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [4, 4],
 	"textures": {
-		"0": "yqils_arknights:block/weaponforgebase",
-		"1": "yqils_arknights:block/weaponforgepoll",
-		"2": "yqils_arknights:block/weaponforgescreen",
-		"3": "yqils_arknights:block/weaponforgebasesheet",
-		"4": "yqils_arknights:block/weaponforgerod",
+		"0": "yqils_arknights:block/weaponforge/weaponforgebase",
+		"1": "yqils_arknights:block/weaponforge/weaponforgepoll",
+		"2": "yqils_arknights:block/weaponforge/weaponforgescreen",
+		"3": "yqils_arknights:block/weaponforge/weaponforgebasesheet",
+		"4": "yqils_arknights:block/weaponforge/weaponforgerod",
 		"6": "yqils_arknights:block/rhodeisland",
-		"particle": "yqils_arknights:block/weaponforgepoll"
+		"particle": "yqils_arknights:block/weaponforge/weaponforgerod"
 	},
 	"elements": [
 		{

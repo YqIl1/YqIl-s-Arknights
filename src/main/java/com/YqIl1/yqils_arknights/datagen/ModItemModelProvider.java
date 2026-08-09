@@ -18,7 +18,6 @@ public class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         simpleItem(ModItems.AMBIGUOUS_MORALITY_MUSIC_DISC);
-        simpleItem(ModItems.GEAR_BASE);
 
 
 
