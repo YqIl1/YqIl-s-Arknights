@@ -4,6 +4,8 @@ import com.YqIl1.yqils_arknights.block.ModBlocks;
 import com.YqIl1.yqils_arknights.block.entity.ModBlockEntities;
 import com.YqIl1.yqils_arknights.block.entity.renderer.WeaponForgingStationBlockEntityRenderer;
 import com.YqIl1.yqils_arknights.client.EyjafjallaWandCooldownOverlay;
+import com.YqIl1.yqils_arknights.client.IfritFlamethrowerCooldownOverlay;
+import com.YqIl1.yqils_arknights.client.IfritFuelTankRenderLayer;
 import com.YqIl1.yqils_arknights.client.LapplandHitCounterOverlay;
 import com.YqIl1.yqils_arknights.client.MlynarNewspaperCooldownOverlay;
 import com.YqIl1.yqils_arknights.effect.ModEffects;
@@ -19,7 +21,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -109,6 +113,11 @@ public class Yqils_arknights {
 
             // Without this, transparent pixels in the block's textures render as solid black instead of see-through
             event.enqueueWork(() -> ItemBlockRenderTypes.setRenderLayer(ModBlocks.WEAPON_FORGING_STATION.get(), RenderType.cutout()));
+
+            // Drives the "using" predicate in ifrit_flamethrower_using.json's model overrides, same mechanism
+            // vanilla uses for the bow's "pulling" model swap
+            event.enqueueWork(() -> ItemProperties.register(ModItems.IFRIT_FLAMETHROWER.get(), new ResourceLocation("using"),
+                    (stack, level, entity, seed) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F));
         }
 
         @SubscribeEvent
@@ -131,10 +140,19 @@ public class Yqils_arknights {
         }
 
         @SubscribeEvent
+        public static void addLayers(EntityRenderersEvent.AddLayers event) {
+            for (String skinName : event.getSkins()) {
+                PlayerRenderer renderer = event.getSkin(skinName);
+                renderer.addLayer(new IfritFuelTankRenderLayer(renderer));
+            }
+        }
+
+        @SubscribeEvent
         public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
             event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "lappland_hit_counter", new LapplandHitCounterOverlay());
             event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "eyjafjalla_wand_cooldown", new EyjafjallaWandCooldownOverlay());
             event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "mlynar_newspaper_cooldown", new MlynarNewspaperCooldownOverlay());
+            event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "ifrit_flamethrower_cooldown", new IfritFlamethrowerCooldownOverlay());
         }
     }
 }

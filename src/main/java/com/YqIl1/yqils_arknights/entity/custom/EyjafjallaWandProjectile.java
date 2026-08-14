@@ -50,7 +50,7 @@ public class EyjafjallaWandProjectile extends ThrowableItemProjectile {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         Entity target = result.getEntity();
-        DamageSource damageSource = this.damageSources().thrown(this, this.getOwner());
+        DamageSource damageSource = this.damageSources().indirectMagic(this, this.getOwner());
         target.hurt(damageSource, this.damage);
 
 

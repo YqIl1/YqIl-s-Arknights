@@ -34,6 +34,8 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         WeaponForgeRecipeBuilder.weaponForging(ModItems.EYJAFJALLA_WAND.get())
                 .save(pWriter, "eyjafjala_wand_from_forging");
 
+        WeaponForgeRecipeBuilder.weaponForging(ModItems.IFRIT_FLAMETHROWER.get())
+                .save(pWriter, "ifrift_flamethrower_from_forging");
 
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WEAPON_FORGING_STATION_ITEM.get())
@@ -48,12 +50,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .save(pWriter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GEAR_BASE.get())
-                .pattern("ICI")
-                .pattern("CGC")
-                .pattern("ICI")
+                .pattern("IGI")
+                .pattern("ANL")
+                .pattern("IRI")
                 .define('I', Items.IRON_INGOT)
-                .define('C', Items.COAL)
                 .define('G', Items.GOLD_INGOT)
+                .define('A', Items.AMETHYST_SHARD)
+                .define('N', Items.NETHERITE_SCRAP)
+                .define('L', Items.LAPIS_LAZULI)
+                .define('R', Items.REDSTONE)
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                 .save(pWriter);
 

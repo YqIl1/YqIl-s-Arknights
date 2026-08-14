@@ -3,6 +3,7 @@ package com.YqIl1.yqils_arknights.effect;
 import com.YqIl1.yqils_arknights.Yqils_arknights;
 import com.YqIl1.yqils_arknights.effect.custom.EyjafjallaWandPowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.FragileEffect;
+import com.YqIl1.yqils_arknights.effect.custom.ImmolationEffect;
 import com.YqIl1.yqils_arknights.effect.custom.LapplandBladePowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.MlynarPowerEffect;
 import net.minecraft.world.effect.MobEffect;
@@ -31,5 +32,7 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> EYJAFJALLA_WAND_POWER = MOB_EFFECTS.register("eyjafjalla_wand_power",
             () -> new EyjafjallaWandPowerEffect(MobEffectCategory.BENEFICIAL, 0xED96A9));
 
-
+    // Deals 1 fire damage per second; granted to targets hit by the flamethrower's charged skill activation
+    public static final RegistryObject<MobEffect> IMMOLATION = MOB_EFFECTS.register("immolation",
+            () -> new ImmolationEffect(MobEffectCategory.HARMFUL, 0xFF4500));
 }

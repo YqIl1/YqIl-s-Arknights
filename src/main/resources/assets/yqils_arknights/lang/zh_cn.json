@@ -28,17 +28,24 @@
 
   "item.yqils_arknights.mlynar_newspaper": "报纸",
   "item.yqils_arknights.mlynar_newspaper.jei_info": "玛恩纳的报纸",
-  "item.yqils_arknights.mlynar_newspaper.description": "右键使用获得30秒的未照耀的荣光, 40秒冷却",
+  "item.yqils_arknights.mlynar_newspaper.description": "长按右键获得30秒的未照耀的荣光, 40秒冷却",
 
   "effect.yqils_arknights.mlynar_power": "未照耀的荣光",
-  "effect.yqils_arknights.mlynar_power.description": "获得11伤害和2距离",
+  "effect.yqils_arknights.mlynar_power.description": "攻击范围扩大2格, 攻击力提升至400%(每击倒一名敌人时倍率-10%, 最多减少200%, 周围存在3名及以上敌人时攻击力提升至405%且受到的伤害减少25%",
 
-  "effect.yqils_arknights.lapplad_blade_power": "狼魂",
-  "effect.yqils_arknights.lapplad_blade_power.description": "攻击力+120%，远程攻击额外发射一个投掷物，远程攻击不再降低攻击力",
+  "effect.yqils_arknights.lappland_blade_power": "狼魂",
+  "effect.yqils_arknights.lappland_blade_power.description": "攻击力+120%，远程攻击额外发射一个投掷物，远程攻击不再降低攻击力",
 
   "item.yqils_arknights.eyjafjalla_wand": "艾雅法拉的源石施术单元",
-  "item.yqils_arknights.eyjafjalla_wand.decription": "右键进行远程攻击\n下蹲右键开启火山，持续15秒",
+  "item.yqils_arknights.eyjafjalla_wand.decription": "右键进行远程攻击\nShift右键开启火山，持续15秒",
 
   "effect.yqils_arknights.eyjafjalla_wand_power": "火山",
-  "effect.yqils_arknights.eyjafjalla_wand_power.description": "攻击力+130%; 距离提升; 攻击间隔缩短1.1秒; 远程攻击额外创造5发随机方向的投掷物"
+  "effect.yqils_arknights.eyjafjalla_wand_power.description": "攻击力+130%; 距离提升; 攻击间隔缩短1.1秒; 远程攻击额外创造5发随机方向的投掷物",
+
+  "item.yqils_arknights.ifrit_flamethrower": "伊芙利特的喷火器",
+  "item.yqils_arknights.ifrit_flamethrower.description": "长按右键对前方敌人造成魔法伤害, 每秒失去1点耐久, 不在使用时每秒恢复1点耐久，高于50点耐久时恢复翻倍 \n每七秒, 获得一层炎爆充能（可充能3次）: 下次攻击造成相当于攻击力250%的法术伤害，命中目标获得3秒灼伤",
+
+  "effect.yqils_arknights.immolation": "灼伤",
+  "effect.yqils_arknights.immolation.description": "防御-3，每秒受到等同于攻击者33%攻击力的法术伤害"
+
 }

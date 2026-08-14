@@ -62,5 +62,26 @@
         "name": "yqils_arknights:eyjafjalla_wand_power"
       }
     ]
+  },
+  "ifrit_flamethrower_ranged": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:ifrit_flamethrower_ranged"
+      }
+    ]
+  },
+  "ifrit_flamethrower_power": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:ifrit_flamethrower_power"
+      }
+    ]
+  },
+  "ifrit_flamethrower_power_ranged": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:ifrit_flamethrower_power_ranged"
+      }
+    ]
   }
 }
