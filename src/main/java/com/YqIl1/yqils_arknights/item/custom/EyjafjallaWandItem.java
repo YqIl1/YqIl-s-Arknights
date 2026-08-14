@@ -56,15 +56,15 @@ public class EyjafjallaWandItem extends Item {
                             ModSound.EYJAFJALLA_WAND_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
             }
-            float rangedDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
-
-            fireProjectile(level,player,rangedDamage,2,0,60);
+            float rangedDamage = (float) Math.max((float)player.getAttributeValue(Attributes.ATTACK_DAMAGE), (float)8);
             if (hasPower) {
+                rangedDamage -= 4;
                 cooldown = 2;
                 for(int i = 0; i < 4; i++){
                     fireProjectile(level,player,rangedDamage,3+(float)Math.random()*6,45-(float)Math.random()*90,90);
                 }
             }
+            fireProjectile(level,player,rangedDamage,2,0,60);
 
             itemstack.hurtAndBreak(1, player, (entity) -> entity.broadcastBreakEvent(interactionHand));
 
@@ -115,7 +115,7 @@ public class EyjafjallaWandItem extends Item {
     private EyjafjallaWandProjectile fireProjectile(Level level, Player player, float dmg, float xOffset, float yOffset, int lifetime) {
         EyjafjallaWandProjectile projectile = new EyjafjallaWandProjectile(level, player);
         projectile.setMaxLifetime(lifetime);
-        projectile.setDamage(dmg+8);
+        projectile.setDamage(dmg);
         projectile.shootFromRotation(player, player.getXRot()-xOffset, player.getYRot()+yOffset, 0.0F, 1.5F, 1.0F);
         level.addFreshEntity(projectile);
 

@@ -60,7 +60,11 @@ public class LapplandBladeProjectile extends ThrowableItemProjectile {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         Entity target = result.getEntity();
-        DamageSource damageSource = this.damageSources().thrown(this, this.getOwner());
+        Entity projectileOwner = this.getOwner();
+        boolean hasPower = projectileOwner instanceof LivingEntity livingOwner && livingOwner.hasEffect(ModEffects.LAPPLAND_BLADE_POWER.get());
+        DamageSource damageSource = hasPower
+                ? this.damageSources().indirectMagic(this, projectileOwner)
+                : this.damageSources().thrown(this, projectileOwner);
         target.hurt(damageSource, this.damage);
 
         if (!this.level().isClientSide) {

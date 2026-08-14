@@ -4,6 +4,7 @@ import com.YqIl1.yqils_arknights.block.ModBlocks;
 import com.YqIl1.yqils_arknights.Yqils_arknights;
 import com.YqIl1.yqils_arknights.item.custom.EyjafjallaWandItem;
 import com.YqIl1.yqils_arknights.item.custom.GearBaseItem;
+import com.YqIl1.yqils_arknights.item.custom.IfritFlamethrowerItem;
 import com.YqIl1.yqils_arknights.item.custom.LapplandBladeItem;
 import com.YqIl1.yqils_arknights.item.custom.MlynarNewspaperItem;
 import com.YqIl1.yqils_arknights.sound.ModSound;
@@ -43,4 +44,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> EYJAFJALLA_WAND_PROJECTILE = ITEMS.register("eyjafjalla_wand_projectile",
             () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> IFRIT_FLAMETHROWER = ITEMS.register("ifrit_flamethrower",
+            () -> new IfritFlamethrowerItem(new Item.Properties()));
 }
