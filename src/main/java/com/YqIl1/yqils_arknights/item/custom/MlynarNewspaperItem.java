@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MlynarNewspaperItem extends Item {
+public class MlynarNewspaperItem extends Item implements CrosshairCounterItem {
     private static final String MLYNAR_LAST_USED_KEY = "yqils_arknights:mlynar_last_used";
     public static final int MLYNAR_COOLDOWN_SECONDS = 40;
     public static final int MLYNAR_COOLDOWN_TICKS = MLYNAR_COOLDOWN_SECONDS * 20; //  40s cooldown
@@ -55,18 +55,18 @@ public class MlynarNewspaperItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
 
-        if (!pLevel.isClientSide) {
-            CompoundTag tag = itemstack.getOrCreateTag();
-            long lastUsed = tag.getLong(MLYNAR_LAST_USED_KEY);
-            long elapsed = pLevel.getGameTime() - lastUsed;
-            if (elapsed < MLYNAR_COOLDOWN_TICKS) {
-                return InteractionResultHolder.fail(itemstack);
-            }
+        CompoundTag tag = itemstack.getOrCreateTag();
+        long lastUsed = tag.getLong(MLYNAR_LAST_USED_KEY);
+        long elapsed = pLevel.getGameTime() - lastUsed;
+        if (elapsed < MLYNAR_COOLDOWN_TICKS) {
+            return InteractionResultHolder.fail(itemstack);
         }
 
+
         pPlayer.startUsingItem(pHand);
-        return InteractionResultHolder.consume(itemstack);
+        return InteractionResultHolder.success(itemstack);
     }
+
 
     // Only called once the full 1-second hold completes (unlike releaseUsing, which would also
     // fire on an early release) -- this is where the effect actually activates.
@@ -86,6 +86,12 @@ public class MlynarNewspaperItem extends Item {
         }
         return stack;
     }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || oldStack.getItem() != newStack.getItem();
+    }
+
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean isSelected) {
@@ -115,5 +121,10 @@ public class MlynarNewspaperItem extends Item {
         long elapsedTicks = level.getGameTime() - tag.getLong(MLYNAR_LAST_USED_KEY);
         long elapsedSeconds = elapsedTicks / 20;
         return (int) Math.min(elapsedSeconds, MLYNAR_COOLDOWN_SECONDS);
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level) {
+        return getMlynarElapsedSeconds(stack, level) + "/" + MLYNAR_COOLDOWN_SECONDS;
     }
 }

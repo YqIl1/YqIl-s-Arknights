@@ -6,6 +6,7 @@ import com.YqIl1.yqils_arknights.effect.custom.FragileEffect;
 import com.YqIl1.yqils_arknights.effect.custom.ImmolationEffect;
 import com.YqIl1.yqils_arknights.effect.custom.LapplandBladePowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.MlynarPowerEffect;
+import com.YqIl1.yqils_arknights.effect.custom.NCDeerFanPowerEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.registries.DeferredRegister;
@@ -35,4 +36,8 @@ public class ModEffects {
     // Deals 1 fire damage per second; granted to targets hit by the flamethrower's charged skill activation
     public static final RegistryObject<MobEffect> IMMOLATION = MOB_EFFECTS.register("immolation",
             () -> new ImmolationEffect(MobEffectCategory.HARMFUL, 0xFF4500));
+
+    // Granted by NC Deer Fan's hold-to-activate -- behavior TBD
+    public static final RegistryObject<MobEffect> NC_DEER_FAN_POWER = MOB_EFFECTS.register("nc_deer_fan_power",
+            () -> new NCDeerFanPowerEffect(MobEffectCategory.BENEFICIAL, 0xFAFAFA));
 }

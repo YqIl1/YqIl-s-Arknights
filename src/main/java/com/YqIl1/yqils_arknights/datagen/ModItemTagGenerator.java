@@ -2,6 +2,7 @@ package com.YqIl1.yqils_arknights.datagen;
 
 import com.YqIl1.yqils_arknights.Yqils_arknights;
 import com.YqIl1.yqils_arknights.item.ModItems;
+import com.YqIl1.yqils_arknights.util.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
@@ -24,6 +25,21 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ItemTags.MUSIC_DISCS).add(ModItems.AMBIGUOUS_MORALITY_MUSIC_DISC.get());
         this.tag(ItemTags.CREEPER_DROP_MUSIC_DISCS).add(ModItems.AMBIGUOUS_MORALITY_MUSIC_DISC.get());
 
+        //Sword
         this.tag(ItemTags.SWORDS).add(ModItems.LAPPLAND_BLADE.get());
+
+
+        //Weapons
+        this.tag(ModTags.Items.WEAPONS).add(ModItems.LAPPLAND_BLADE.get());
+        this.tag(ModTags.Items.WEAPONS).add(ModItems.EYJAFJALLA_WAND.get());
+        this.tag(ModTags.Items.WEAPONS).add(ModItems.IFRIT_FLAMETHROWER.get());
+
+        //Supports
+        this.tag(ModTags.Items.SUPPORTS).add(ModItems.MLYNAR_NEWSPAPER.get());
+        this.tag(ModTags.Items.SUPPORTS).add(ModItems.NCDEER_FAN.get());
+
+        //No Melee
+        this.tag(ModTags.Items.NO_MELEE).add(ModItems.EYJAFJALLA_WAND.get());
+        this.tag(ModTags.Items.NO_MELEE).add(ModItems.IFRIT_FLAMETHROWER.get());
     }
 }

@@ -1,7 +1,6 @@
 package com.YqIl1.yqils_arknights.compat;
 
 import com.YqIl1.yqils_arknights.Yqils_arknights;
-import com.YqIl1.yqils_arknights.block.ModBlocks;
 import com.YqIl1.yqils_arknights.item.ModItems;
 import com.YqIl1.yqils_arknights.recipe.WeaponForgeRecipe;
 import mezz.jei.api.IModPlugin;
@@ -15,7 +14,6 @@ import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 
@@ -47,11 +45,15 @@ public class YqilsArknightsJeiPlugin implements IModPlugin {
 
         registration.addRecipes(WeaponForgingCatagory.RECIPE_TYPE,
                 recipeManager.getAllRecipesFor(WeaponForgeRecipe.Type.INSTANCE));
+
+       //effects to the items
+        registration.addRecipes(ItemEffectCategory.RECIPE_TYPE, ItemEffectDisplay.all());
     }
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new WeaponForgingCatagory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new ItemEffectCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override

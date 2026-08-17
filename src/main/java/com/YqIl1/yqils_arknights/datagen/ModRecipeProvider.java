@@ -25,6 +25,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildRecipes(Consumer<FinishedRecipe> pWriter) {
+        //WeaponForges
         WeaponForgeRecipeBuilder.weaponForging(ModItems.LAPPLAND_BLADE.get())
                 .save(pWriter, "lappland_blade_from_weapon_forging");
 
@@ -36,6 +37,9 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
         WeaponForgeRecipeBuilder.weaponForging(ModItems.IFRIT_FLAMETHROWER.get())
                 .save(pWriter, "ifrift_flamethrower_from_forging");
+        WeaponForgeRecipeBuilder.weaponForging(ModItems.NCDEER_FAN.get())
+                .save(pWriter, "ncdeer_fan_from_forging");
+
 
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WEAPON_FORGING_STATION_ITEM.get())

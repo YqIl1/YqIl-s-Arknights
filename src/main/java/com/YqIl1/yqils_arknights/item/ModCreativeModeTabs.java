@@ -27,6 +27,7 @@ public class ModCreativeModeTabs {
                 output.accept(ModItems.MLYNAR_NEWSPAPER.get());
                 output.accept(ModItems.EYJAFJALLA_WAND.get());
                 output.accept(ModItems.IFRIT_FLAMETHROWER.get());
+                output.accept(ModItems.NCDEER_FAN.get());
 
             }).build());
 }

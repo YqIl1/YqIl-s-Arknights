@@ -3,6 +3,8 @@ package com.YqIl1.yqils_arknights.item.custom;
 import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.entity.custom.EyjafjallaWandProjectile;
 import com.YqIl1.yqils_arknights.sound.ModSound;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.client.renderer.EffectInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -12,6 +14,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -23,14 +28,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class EyjafjallaWandItem extends Item {
+public class EyjafjallaWandItem extends Item implements CrosshairCounterItem {
     private static final String VOLCANO_LAST_USED_KEY = "yqils_arknights:volcano_last_used";
     public static final int VOLCANO_COOLDOWN_TICKS = 1600; // 80s * 20 ticks/sec
+    private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public EyjafjallaWandItem(Properties p_41383_) {
         super(p_41383_.rarity(Rarity.EPIC).stacksTo(1).durability(512));
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Base attack damage", 7.0D, AttributeModifier.Operation.ADDITION));
+        this.defaultModifiers = builder.build();
     }
 
+
+
+    @Override
+    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        return slot == EquipmentSlot.MAINHAND ? this.defaultModifiers : super.getDefaultAttributeModifiers(slot);
+    }
     @Override
     public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> components, TooltipFlag p_41424_) {
         components.add(Component.translatable("item.yqils_arknights.eyjafjalla_wand.decription"));
@@ -56,9 +71,9 @@ public class EyjafjallaWandItem extends Item {
                             ModSound.EYJAFJALLA_WAND_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
             }
-            float rangedDamage = (float) Math.max((float)player.getAttributeValue(Attributes.ATTACK_DAMAGE), (float)8);
+            float rangedDamage = (float)player.getAttributeValue(Attributes.ATTACK_DAMAGE);
             if (hasPower) {
-                rangedDamage -= 4;
+                rangedDamage /= 2;
                 cooldown = 2;
                 for(int i = 0; i < 4; i++){
                     fireProjectile(level,player,rangedDamage,3+(float)Math.random()*6,45-(float)Math.random()*90,90);
@@ -110,6 +125,11 @@ public class EyjafjallaWandItem extends Item {
         long elapsedTicks = level.getGameTime() - tag.getLong(VOLCANO_LAST_USED_KEY);
         long elapsedSeconds = elapsedTicks / 20;
         return (int) Math.min(elapsedSeconds, VOLCANO_COOLDOWN_SECONDS);
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level) {
+        return getVolcanoElapsedSeconds(stack, level) + "/" + VOLCANO_COOLDOWN_SECONDS;
     }
 
     private EyjafjallaWandProjectile fireProjectile(Level level, Player player, float dmg, float xOffset, float yOffset, int lifetime) {
