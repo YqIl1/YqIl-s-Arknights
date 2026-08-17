@@ -30,7 +30,7 @@
 
   "item.yqils_arknights.mlynar_newspaper": "Newspaper",
   "item.yqils_arknights.mlynar_newspaper.jei_info": "Mlynar's Newspaper",
-  "item.yqils_arknights.mlynar_newspaper.description": "Hold right click to grant Unbrilliant Glory for 30s, has 40s cooldown after the effect ends",
+  "item.yqils_arknights.mlynar_newspaper.description": "Use to grant Unbrilliant Glory for 30s",
 
   "effect.yqils_arknights.mlynar_power": "Unbrilliant Glory",
   "effect.yqils_arknights.mlynar_power.description": "Attack range increased by 2 blocks, ATK +400%(multiplier -10% for each enemy defeated, max -200%);  If there are 3 or more enemies nearby, ATK increased to 405%, and take 25% less damage",
@@ -39,16 +39,25 @@
   "effect.yqils_arknights.lappland_blade_power.description": "ATK +120%; Ranged Attacks create 1 extra projectile; The damage reduction of Ranged Attacks is removed",
 
   "item.yqils_arknights.eyjafjalla_wand": "Eyjafjalla's Originium Arts Casting Staff",
-  "item.yqils_arknights.eyjafjalla_wand.decription": "Right click to shoot a projectile dealing magic damage \nShift right click activates Volcano for 15s",
+  "item.yqils_arknights.eyjafjalla_wand.decription": "Use to shoot a projectile dealing magic damage \nShift right click activates Volcano for 15s",
 
   "effect.yqils_arknights.eyjafjalla_wand_power": "Volcano",
-  "effect.yqils_arknights.eyjafjalla_wand_power.description": "ATK +130%; Range increase; Attack Interval reduce by 1.1 seconds; Ranged Attacks shoots 5 extra projectile in random directions",
+  "effect.yqils_arknights.eyjafjalla_wand_power.description": "Range increase; Attack Interval reduce by 1.1 seconds; Ranged Attacks shoots 5 extra projectile in random directions with 50% ATK",
 
   "item.yqils_arknights.ifrit_flamethrower": "Ifrit's Flamethrower",
-  "item.yqils_arknights.ifrit_flamethrower.description": "Hold right click to deal magic damage to enemy in front, cost 1 durability every second, recover 1 per second when not used, doubles when above 50 \nEvery 7 seconds, gain a charge of Pyroclasm(Can store 3 charges): Deals 250% of ATK Arts damage in the next attack; Targets' gain Immolation for 3 seconds",
-
+  "item.yqils_arknights.ifrit_flamethrower.description": "Use to continuously deal magic damage to enemy in front, cost 3 durability every second, recover 1 per second when not used, doubles when above half durability \nEvery 7 seconds, gain a charge of Pyroclasm(Can store 3 charges): Deals 250% of ATK Arts damage in the next attack; Targets' gain Immolation for 3 seconds",
 
   "effect.yqils_arknights.immolation": "Immolation",
-  "effect.yqils_arknights.immolation.description": "DEF -3; Deals magic damage per second equal to 33% of the attacker's ATK per second"
+  "effect.yqils_arknights.immolation.description": "DEF -3; Deals magic damage per second equal to 33% of the attacker's ATK per second",
+
+  "item.yqils_arknights.ncdeer_fan": "Nine-Colored Deer's Three Hares Round Fan",
+  "item.yqils_arknights.ncdeer_fan.description": "Use to grant Return to the Immortal Mountain for 20s",
+
+  "effect.yqils_arknights.nc_deer_fan_power": "Return to the Immortal Mountain",
+  "effect.yqils_arknights.nc_deer_fan_power.description": "Attack speed * 1.5 and gain 26% damage reduction from all sources",
+
+  "jei.yqils_arknights.item_effect.title": "Item Effects",
+  "jei.yqils_arknights.item_effect.gain_label": "Effect Gain",
+  "jei.yqils_arknights.item_effect.apply_label": "Effect Apply"
 
 }

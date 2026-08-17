@@ -19,10 +19,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class LapplandBladeItem extends SwordItem {
+public class LapplandBladeItem extends SwordItem implements CrosshairCounterItem {
     private static final String HIT_COUNTER_KEY = "yqils_arknights:hit_counter";
     public static final int POWER_THRESHOLD = 17;
-    private static final int POWER_EFFECT_DURATION_TICKS = 400;
+    public static final int POWER_EFFECT_DURATION_TICKS = 400;
 
     public LapplandBladeItem() {
         super(Tiers.DIAMOND, 4, -2.4F, new Item.Properties().rarity(Rarity.EPIC));
@@ -53,6 +53,10 @@ public class LapplandBladeItem extends SwordItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        double attackSpeed = player.getAttributeValue(Attributes.ATTACK_SPEED);
+        if (attackSpeed == 0){
+            return InteractionResultHolder.fail(stack);
+        }
 
         if (!level.isClientSide) {
             // Ranged attacks are normally reduced to 80% of melee damage, but that reduction is waived
@@ -78,7 +82,7 @@ public class LapplandBladeItem extends SwordItem {
         }
 
         // Cooldown matches however long it currently takes this player to fully recharge their attack (20 ticks / attacks-per-second)
-        double attackSpeed = player.getAttributeValue(Attributes.ATTACK_SPEED);
+
         int cooldownTicks = (int) Math.round(20.0 / attackSpeed);
         player.getCooldowns().addCooldown(this, cooldownTicks);
 
@@ -120,5 +124,10 @@ public class LapplandBladeItem extends SwordItem {
     public static int getHitCount(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         return tag != null ? tag.getInt(HIT_COUNTER_KEY) : 0;
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level) {
+        return getHitCount(stack) + "/" + POWER_THRESHOLD;
     }
 }

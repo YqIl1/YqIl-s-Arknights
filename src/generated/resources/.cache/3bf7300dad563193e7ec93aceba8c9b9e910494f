@@ -1,4 +1,7 @@
-// 1.20.1	2026-08-05T05:06:53.457505	Tags for minecraft:item mod id yqils_arknights
+// 1.20.1	2026-08-17T12:56:39.444269	Tags for minecraft:item mod id yqils_arknights
 8e0733053da60a6d22e8e2ae7f2d8936b99fcca0 data/minecraft/tags/items/creeper_drop_music_discs.json
 8e0733053da60a6d22e8e2ae7f2d8936b99fcca0 data/minecraft/tags/items/music_discs.json
 78ec17f8d0f3bbc91da558d7f406a445181b6639 data/minecraft/tags/items/swords.json
+3ce5c054361eb45e850d5edc9cbabd0875deafb6 data/yqils_arknights/tags/items/no_melee.json
+4f295e2561e632aee37bd04a41f6084b00e30e2f data/yqils_arknights/tags/items/supports.json
+2ec13b65ddd85a0536a2e17c569d34c31d71eb16 data/yqils_arknights/tags/items/weapons.json

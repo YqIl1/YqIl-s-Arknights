@@ -3,11 +3,8 @@ package com.YqIl1.yqils_arknights;
 import com.YqIl1.yqils_arknights.block.ModBlocks;
 import com.YqIl1.yqils_arknights.block.entity.ModBlockEntities;
 import com.YqIl1.yqils_arknights.block.entity.renderer.WeaponForgingStationBlockEntityRenderer;
-import com.YqIl1.yqils_arknights.client.EyjafjallaWandCooldownOverlay;
-import com.YqIl1.yqils_arknights.client.IfritFlamethrowerCooldownOverlay;
+import com.YqIl1.yqils_arknights.client.CrosshairCounterOverlay;
 import com.YqIl1.yqils_arknights.client.IfritFuelTankRenderLayer;
-import com.YqIl1.yqils_arknights.client.LapplandHitCounterOverlay;
-import com.YqIl1.yqils_arknights.client.MlynarNewspaperCooldownOverlay;
 import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.entity.ModEntities;
 import com.YqIl1.yqils_arknights.item.ModCreativeModeTabs;
@@ -149,10 +146,7 @@ public class Yqils_arknights {
 
         @SubscribeEvent
         public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
-            event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "lappland_hit_counter", new LapplandHitCounterOverlay());
-            event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "eyjafjalla_wand_cooldown", new EyjafjallaWandCooldownOverlay());
-            event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "mlynar_newspaper_cooldown", new MlynarNewspaperCooldownOverlay());
-            event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "ifrit_flamethrower_cooldown", new IfritFlamethrowerCooldownOverlay());
+            event.registerAbove(VanillaGuiOverlay.CROSSHAIR.id(), "crosshair_counter", new CrosshairCounterOverlay());
         }
     }
 }

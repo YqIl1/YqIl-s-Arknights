@@ -83,5 +83,12 @@
         "name": "yqils_arknights:ifrit_flamethrower_power_ranged"
       }
     ]
+  },
+  "ncdeer_fan_power": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:ncdeer_fan_power"
+      }
+    ]
   }
 }

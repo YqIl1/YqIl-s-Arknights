@@ -36,9 +36,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class IfritFlamethrowerItem extends Item {
+public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem {
     private static final double CONE_HALF_ANGLE_DEGREES = 30.0;
-    private static final int DAMAGE_INTERVAL_TICKS = 10; // apply damage 2x/sec
+    private static final int DAMAGE_INTERVAL_TICKS = 5; // apply damage 2x/sec
     private static final int PARTICLE_STEPS = 6; // clusters spaced along the stream, from face to max range
     private static final int PARTICLES_PER_STEP = 2;
     private static final int PARTICLE_VISIBLE_TICKS = 5; // how long the stream shows per attack
@@ -46,7 +46,7 @@ public class IfritFlamethrowerItem extends Item {
     // Skill effect: the next damage application after activation deals 250% damage and applies
     // Immolation (3s) to everything it hits, then reverts to normal until the skill fires again.
     private static final float BOOSTED_DAMAGE_MULTIPLIER = 2.5F;
-    private static final int IMMOLATION_DURATION_TICKS = 60; // 3s
+    public static final int IMMOLATION_DURATION_TICKS = 60; // 3s
     private static final float IMMOLATION_DAMAGE_PERCENT = 0.33F; // of the attacker's ATTACK_DAMAGE at apply time
     private static final String PENDING_BOOST_KEY = "yqils_arknights:flamethrower_pending_boost";
 
@@ -57,13 +57,14 @@ public class IfritFlamethrowerItem extends Item {
     private static final String CHARGES_KEY = "yqils_arknights:flamethrower_charges";
     private static final String LAST_REGEN_TICK_KEY = "yqils_arknights:flamethrower_last_regen";
 
-    // Durability doubles as "fuel": drains 1/sec while firing, blocks use once it's down to 1 so it
+    // Durability doubles as "fuel": drains 3/sec while firing, blocks use once it's down to 1 so it
     // can never actually break through this drain, and recovers 1/sec while idle (2/sec once above
     // half of max durability).
     private static final int DURABILITY_DRAIN_INTERVAL_TICKS = 20; // 1s
     private static final int DURABILITY_RECOVER_INTERVAL_TICKS = 20; // 1s
-    private static final int DURABILITY_FAST_RECOVER_THRESHOLD = 50;
-    private static final int MIN_DURABILITY_TO_USE = 1;
+    private static final int MAX_DURABILITY = 48;
+    private static final int DURABILITY_FAST_RECOVER_THRESHOLD = MAX_DURABILITY/2;
+    private static final int MIN_DURABILITY_TO_USE = 4;
     private static final int EMPTY_COOLDOWN_TICKS = 200; // 10s, applied when forced to stop from low durability
     private static final String LAST_DURABILITY_RECOVER_TICK_KEY = "yqils_arknights:flamethrower_last_durability_recover";
 
@@ -123,8 +124,6 @@ public class IfritFlamethrowerItem extends Item {
         int charges = tag.contains(CHARGES_KEY) ? tag.getInt(CHARGES_KEY) : MAX_CHARGES;
 
         if (charges >= MAX_CHARGES) {
-            tag.putInt(CHARGES_KEY, MAX_CHARGES);
-            tag.putLong(LAST_REGEN_TICK_KEY, level.getGameTime());
             return;
         }
 
@@ -168,16 +167,19 @@ public class IfritFlamethrowerItem extends Item {
                 offhand.xRot = -0.5F;
             });
 
-    // Hidden (no "+4 Attack Damage" tooltip line -- see getDefaultTooltipHideFlags) flat bonus,
-    // since the item's own custom description already covers its stats.
-    private static final UUID ATTACK_DAMAGE_MODIFIER_ID = UUID.fromString("cb9093a4-a1ac-4696-99cb-0a31b7968359");
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || oldStack.getItem() != newStack.getItem();
+    }
+
+
     public IfritFlamethrowerItem(Properties p_41383_) {
-        super(p_41383_.rarity(Rarity.EPIC).stacksTo(1).durability(100));
+        super(p_41383_.rarity(Rarity.EPIC).stacksTo(1).durability(MAX_DURABILITY));
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(
-                ATTACK_DAMAGE_MODIFIER_ID, "Weapon modifier", 4.0D, AttributeModifier.Operation.ADDITION));
+                BASE_ATTACK_DAMAGE_UUID, "Base attack damage", 3.0D, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = builder.build();
     }
 
@@ -187,13 +189,8 @@ public class IfritFlamethrowerItem extends Item {
     }
 
     @Override
-    public int getDefaultTooltipHideFlags(@NotNull ItemStack stack) {
-        return ItemStack.TooltipPart.MODIFIERS.getMask();
-    }
-
-    @Override
     public int getUseDuration(ItemStack stack) {
-        return 1900;
+        return 2000;
     }
 
     @Override
@@ -209,7 +206,7 @@ public class IfritFlamethrowerItem extends Item {
         }
 
         player.startUsingItem(interactionHand);
-        return InteractionResultHolder.consume(stack);
+        return InteractionResultHolder.success(stack);
     }
 
     // Called every tick while held-down use continues -- this is where the actual flamethrower
@@ -229,14 +226,14 @@ public class IfritFlamethrowerItem extends Item {
                 }
                 return;
             }
-            stack.setDamageValue(stack.getDamageValue() + 1);
+            stack.hurtAndBreak(3, entity, player -> player.broadcastBreakEvent(EquipmentSlot.MAINHAND));
         }
 
         if (remainingUseDuration % DAMAGE_INTERVAL_TICKS == 0) {
             tryActivateSkill(level, entity, stack);
         }
 
-        double range = entity.getAttributeValue(ForgeMod.ENTITY_REACH.get())+2;
+        double range = entity.getAttributeValue(ForgeMod.ENTITY_REACH.get())+9;
         Vec3 lookVec = entity.getLookAngle();
 
         // Particles stay visible for PARTICLE_VISIBLE_TICKS starting at each real attack tick,
@@ -322,6 +319,16 @@ public class IfritFlamethrowerItem extends Item {
                     point.x, point.y, point.z,
                     PARTICLES_PER_STEP, 0.15, 0.15, 0.15, 0.01);
         }
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level) {
+        return getRegenElapsedSeconds(stack, level) + "/" + CHARGE_COOLDOWN_SECONDS;
+    }
+
+    @Override
+    public String getCrosshairSecondaryText(ItemStack stack, Level level) {
+        return String.valueOf(getCharges(stack));
     }
 
     // PlayerRenderer only consults getUseAnimation() while actively using the item (right-click held);

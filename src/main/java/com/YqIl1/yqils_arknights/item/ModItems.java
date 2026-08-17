@@ -2,11 +2,7 @@ package com.YqIl1.yqils_arknights.item;
 
 import com.YqIl1.yqils_arknights.block.ModBlocks;
 import com.YqIl1.yqils_arknights.Yqils_arknights;
-import com.YqIl1.yqils_arknights.item.custom.EyjafjallaWandItem;
-import com.YqIl1.yqils_arknights.item.custom.GearBaseItem;
-import com.YqIl1.yqils_arknights.item.custom.IfritFlamethrowerItem;
-import com.YqIl1.yqils_arknights.item.custom.LapplandBladeItem;
-import com.YqIl1.yqils_arknights.item.custom.MlynarNewspaperItem;
+import com.YqIl1.yqils_arknights.item.custom.*;
 import com.YqIl1.yqils_arknights.sound.ModSound;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -47,4 +43,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> IFRIT_FLAMETHROWER = ITEMS.register("ifrit_flamethrower",
             () -> new IfritFlamethrowerItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> NCDEER_FAN = ITEMS.register("ncdeer_fan",
+            () -> new NCDeerFanItem(new Item.Properties()));
 }

@@ -3,16 +3,16 @@ package com.YqIl1.yqils_arknights.event;
 import com.YqIl1.yqils_arknights.Yqils_arknights;
 import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.effect.custom.MlynarPowerEffect;
+import com.YqIl1.yqils_arknights.effect.custom.NCDeerFanPowerEffect;
+import com.YqIl1.yqils_arknights.item.ModItems;
 import com.YqIl1.yqils_arknights.item.custom.LapplandBladeItem;
+import com.YqIl1.yqils_arknights.util.ModTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -36,6 +36,10 @@ public class ModEventHandlers {
                 && entity.getPersistentData().getBoolean(MlynarPowerEffect.THRESHOLD_MET_KEY)) {
             event.setAmount(event.getAmount() * (1.0F - MlynarPowerEffect.THRESHOLD_DAMAGE_REDUCTION));
         }
+
+        if (entity.hasEffect(ModEffects.NC_DEER_FAN_POWER.get())) {
+            event.setAmount(event.getAmount() * (1.0F - NCDeerFanPowerEffect.DAMAGE_REDUCTION));
+        }
     }
 
     // Vanilla hardcodes melee damage to damageSources().playerAttack(...) inside Player.attack(),
@@ -56,15 +60,27 @@ public class ModEventHandlers {
         if (!player.hasEffect(ModEffects.LAPPLAND_BLADE_POWER.get())) {
             return;
         }
-
         LivingEntity target = event.getEntity();
         float amount = event.getAmount();
         event.setCanceled(true);
         target.hurt(player.damageSources().indirectMagic(player, player), amount);
-        // Canceling the original attack skips Player#attack's own follow-through (Player.java:1210),
-        // which is where ItemStack#hurtEnemy normally gets called -- re-trigger it manually so the
-        // blade's melee sound, hit counter, and Fragile application still happen.
         player.getMainHandItem().hurtEnemy(target, player);
+    }
+
+    //Not allowing wand items to damage with melee
+    @SubscribeEvent
+    public static void onLivingAttack(LivingDamageEvent event) {
+        DamageSource source = event.getSource();
+        if (!source.is(DamageTypes.PLAYER_ATTACK)) {
+            return;
+        }
+        if (!(source.getEntity() instanceof Player player)) {
+            return;
+        }
+        if (!(player.getMainHandItem().is(ModTags.Items.NO_MELEE))) {
+            return;
+        }
+        event.setCanceled(true);
     }
 
     // Each kill while Unbrilliant Glory is active decays its attack damage boost, capped at 20 stacks
