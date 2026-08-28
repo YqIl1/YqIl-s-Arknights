@@ -153,20 +153,6 @@ public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem 
         }
     }
 
-    // Same base angles as vanilla's CROSSBOW_HOLD (AnimationUtils.animateCrossbowHold), just without
-    // the "+ head.yRot" / "+ head.xRot" terms that make that pose track the player's view.
-    private static final HumanoidModel.ArmPose FLAMETHROWER_HOLD = HumanoidModel.ArmPose.create(
-            "yqils_arknights:flamethrower_hold", true,
-            (model, entity, arm) -> {
-                boolean mainHand = arm == entity.getMainArm();
-                ModelPart primary = mainHand ? model.rightArm : model.leftArm;
-                ModelPart offhand = mainHand ? model.leftArm : model.rightArm;
-                primary.yRot = mainHand ? -0.3F : 0.3F;
-                offhand.yRot = mainHand ? 0.6F : -0.6F;
-                primary.xRot = -0.5F;
-                offhand.xRot = -0.5F;
-            });
-
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     @Override
@@ -335,11 +321,31 @@ public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem 
     // this hook covers the idle-hold case, giving it trident's throw-ready stance at rest too.
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
-                return FLAMETHROWER_HOLD;
-            }
-        });
+        consumer.accept(new ClientHandler());
+    }
+
+    // Isolated in its own nested class -- and only ever touched from inside initializeClient() above,
+    // which Forge only calls client-side -- so this is the only place HumanoidModel gets resolved.
+    // Referencing it as a field directly on IfritFlamethrowerItem (a common class, loaded on dedicated
+    // servers too) crashes with "attempted to load class ... for invalid dist DEDICATED_SERVER".
+    private static final class ClientHandler implements IClientItemExtensions {
+        // Same base angles as vanilla's CROSSBOW_HOLD (AnimationUtils.animateCrossbowHold), just
+        // without the "+ head.yRot" / "+ head.xRot" terms that make that pose track the player's view.
+        private static final HumanoidModel.ArmPose FLAMETHROWER_HOLD = HumanoidModel.ArmPose.create(
+                "yqils_arknights:flamethrower_hold", true,
+                (model, entity, arm) -> {
+                    boolean mainHand = arm == entity.getMainArm();
+                    ModelPart primary = mainHand ? model.rightArm : model.leftArm;
+                    ModelPart offhand = mainHand ? model.leftArm : model.rightArm;
+                    primary.yRot = mainHand ? -0.3F : 0.3F;
+                    offhand.yRot = mainHand ? 0.6F : -0.6F;
+                    primary.xRot = -0.5F;
+                    offhand.xRot = -0.5F;
+                });
+
+        @Override
+        public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
+            return FLAMETHROWER_HOLD;
+        }
     }
 }

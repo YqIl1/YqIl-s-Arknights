@@ -64,7 +64,7 @@ public class MlynarPowerEffect extends MobEffect {
                 attackDamage.removeModifier(ENEMY_BOOST_MODIFIER_ID);
             }
             attackDamage.addTransientModifier(new AttributeModifier(
-                    ENEMY_BOOST_MODIFIER_ID, "Unbrilliant Glory (enemy boost)", amount, AttributeModifier.Operation.MULTIPLY_TOTAL));
+                    ENEMY_BOOST_MODIFIER_ID, "Unbrilliant Glory (enemy boost)", amount, AttributeModifier.Operation.MULTIPLY_BASE));
         }
     }
 

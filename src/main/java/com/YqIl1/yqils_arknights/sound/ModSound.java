@@ -24,6 +24,9 @@ public class ModSound {
     public static final RegistryObject<SoundEvent> IFRIT_FLAMETHROWER_POWER = registerSoundEvents("ifrit_flamethrower_power");
     public static final RegistryObject<SoundEvent> IFRIT_FLAMETHROWER_POWER_RANGED = registerSoundEvents("ifrit_flamethrower_power_ranged");
     public static final RegistryObject<SoundEvent> NC_DEER_FAN_POWER = registerSoundEvents("ncdeer_fan_power");
+    public static final RegistryObject<SoundEvent> NEARL_SHIELD_MELEE = registerSoundEvents("nearl_shield_melee");
+    public static final RegistryObject<SoundEvent> NEARL_SHIELD_POWER = registerSoundEvents("nearl_shield_power");
+    public static final RegistryObject<SoundEvent> NEARL_SHIELD_POWER_HEAL = registerSoundEvents("nearl_shield_power_heal");
 
     private static RegistryObject<SoundEvent> registerSoundEvents(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Yqils_arknights.MODID, name)));

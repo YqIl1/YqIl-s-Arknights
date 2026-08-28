@@ -2,13 +2,12 @@ package com.YqIl1.yqils_arknights.item.custom;
 
 import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.sound.ModSound;
-import net.minecraft.nbt.CompoundTag;
+import com.YqIl1.yqils_arknights.util.TimedActivation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -23,8 +22,9 @@ import java.util.List;
 
 public class NCDeerFanItem extends Item implements CrosshairCounterItem {
     private static final String NC_DEER_FAN_LAST_USED_KEY = "yqils_arknights:nc_deer_fan_last_used";
-    public static final int NC_DEER_FAN_COOLDOWN_SECONDS = 40;
-    public static final int NC_DEER_FAN_COOLDOWN_TICKS = NC_DEER_FAN_COOLDOWN_SECONDS * 20; // 40s cooldown
+    public static final int NC_DEER_FAN_DURATION_TICKS = 400; // 20s buff
+    public static final int NC_DEER_FAN_COOLDOWN_SECONDS = 40; // additional cooldown, starts once the buff ends
+    public static final int NC_DEER_FAN_COOLDOWN_TICKS = NC_DEER_FAN_COOLDOWN_SECONDS * 20;
 
     public NCDeerFanItem(Properties p_41383_) {
         super(p_41383_.rarity(Rarity.EPIC).stacksTo(1));
@@ -55,10 +55,7 @@ public class NCDeerFanItem extends Item implements CrosshairCounterItem {
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
 
-        CompoundTag tag = itemstack.getOrCreateTag();
-        long lastUsed = tag.getLong(NC_DEER_FAN_LAST_USED_KEY);
-        long elapsed = pLevel.getGameTime() - lastUsed;
-        if (elapsed < NC_DEER_FAN_COOLDOWN_TICKS) {
+        if (!TimedActivation.isReady(itemstack, pLevel, NC_DEER_FAN_LAST_USED_KEY, NC_DEER_FAN_DURATION_TICKS, NC_DEER_FAN_COOLDOWN_TICKS)) {
             return InteractionResultHolder.fail(itemstack);
         }
 
@@ -70,17 +67,12 @@ public class NCDeerFanItem extends Item implements CrosshairCounterItem {
     // fire on an early release) -- this is where the effect actually activates.
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (!level.isClientSide && entity instanceof Player player) {
-            CompoundTag tag = stack.getOrCreateTag();
-            long lastUsed = tag.getLong(NC_DEER_FAN_LAST_USED_KEY);
-            long elapsed = level.getGameTime() - lastUsed;
-
-            if (elapsed >= NC_DEER_FAN_COOLDOWN_TICKS) {
-                player.addEffect(new MobEffectInstance(ModEffects.NC_DEER_FAN_POWER.get(), 400, 0));
-                tag.putLong(NC_DEER_FAN_LAST_USED_KEY, level.getGameTime());
-                level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        ModSound.NC_DEER_FAN_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-            }
+        if (!level.isClientSide && entity instanceof Player player
+                && TimedActivation.isReady(stack, level, NC_DEER_FAN_LAST_USED_KEY, NC_DEER_FAN_DURATION_TICKS, NC_DEER_FAN_COOLDOWN_TICKS)) {
+            player.addEffect(new MobEffectInstance(ModEffects.NC_DEER_FAN_POWER.get(), NC_DEER_FAN_DURATION_TICKS, 0));
+            TimedActivation.markActivated(stack, level, NC_DEER_FAN_LAST_USED_KEY);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    ModSound.NC_DEER_FAN_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
         return stack;
     }
@@ -90,34 +82,8 @@ public class NCDeerFanItem extends Item implements CrosshairCounterItem {
         return slotChanged || oldStack.getItem() != newStack.getItem();
     }
 
-    @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean isSelected) {
-        super.inventoryTick(stack, level, entity, slot, isSelected);
-        if (level.isClientSide || !(entity instanceof Player player)) {
-            return;
-        }
-        if (!player.hasEffect(ModEffects.NC_DEER_FAN_POWER.get())) {
-            return;
-        }
-
-        CompoundTag tag = stack.getTag();
-        if (tag == null || !tag.contains(NC_DEER_FAN_LAST_USED_KEY)) {
-            return;
-        }
-
-        long lastUsed = tag.getLong(NC_DEER_FAN_LAST_USED_KEY);
-        long elapsed = level.getGameTime() - lastUsed;
-        if (elapsed < NC_DEER_FAN_COOLDOWN_TICKS) {
-            tag.putLong(NC_DEER_FAN_LAST_USED_KEY, lastUsed + 1);
-        }
-    }
-
     public static int getNCDeerFanElapsedSeconds(ItemStack stack, Level level) {
-        CompoundTag tag = stack.getTag();
-        if (tag == null) return NC_DEER_FAN_COOLDOWN_SECONDS;
-        long elapsedTicks = level.getGameTime() - tag.getLong(NC_DEER_FAN_LAST_USED_KEY);
-        long elapsedSeconds = elapsedTicks / 20;
-        return (int) Math.min(elapsedSeconds, NC_DEER_FAN_COOLDOWN_SECONDS);
+        return TimedActivation.getElapsedSeconds(stack, level, NC_DEER_FAN_LAST_USED_KEY, NC_DEER_FAN_DURATION_TICKS, NC_DEER_FAN_COOLDOWN_SECONDS);
     }
 
     @Override

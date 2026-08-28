@@ -27,6 +27,11 @@
 
   "gui.yqils_arknights.weapon_forging_station.start": "Start",
 
+  "jei.yqils_arknights.item_effect.title": "Item Effects",
+  "jei.yqils_arknights.item_effect.gain_label": "Effect Gain",
+  "jei.yqils_arknights.item_effect.apply_label": "Effect Apply",
+
+
 
   "item.yqils_arknights.mlynar_newspaper": "Newspaper",
   "item.yqils_arknights.mlynar_newspaper.jei_info": "Mlynar's Newspaper",
@@ -56,8 +61,10 @@
   "effect.yqils_arknights.nc_deer_fan_power": "Return to the Immortal Mountain",
   "effect.yqils_arknights.nc_deer_fan_power.description": "Attack speed * 1.5 and gain 26% damage reduction from all sources",
 
-  "jei.yqils_arknights.item_effect.title": "Item Effects",
-  "jei.yqils_arknights.item_effect.gain_label": "Effect Gain",
-  "jei.yqils_arknights.item_effect.apply_label": "Effect Apply"
+  "item.yqils_arknights.nearl_shield": "Margaret Nearl's knight's shield",
+  "item.yqils_arknights.nearl_shield.description": "Shift right click to grant First Aid Mode for 40s",
+
+  "effect.yqils_arknights.nearl_shield_power": "First Aid Mode",
+  "effect.yqils_arknights.nearl_shield_power.description": "Heal equal to 33% of ATK every 2.5s"
 
 }

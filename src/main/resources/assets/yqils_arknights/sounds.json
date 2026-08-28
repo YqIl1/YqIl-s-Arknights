@@ -90,5 +90,26 @@
         "name": "yqils_arknights:ncdeer_fan_power"
       }
     ]
+  },
+  "nearl_shield_melee": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:nearl_shield_melee"
+      }
+    ]
+  },
+  "nearl_shield_power": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:nearl_shield_power"
+      }
+    ]
+  },
+  "nearl_shield_power_heal": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:nearl_shield_power_heal"
+      }
+    ]
   }
 }

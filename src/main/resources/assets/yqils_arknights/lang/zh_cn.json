@@ -12,6 +12,12 @@
   "effect.yqils_arknights.fragile.description": "承受任意来源的伤害提升10%，每级额外提升10%",
 
 
+  "jei.yqils_arknights.item_effect.title": "物品效果",
+  "jei.yqils_arknights.item_effect.gain_label": "效果获取",
+  "jei.yqils_arknights.item_effect.apply_label": "效果施加",
+
+
+
   "item.yqils_arknights.lappland_blade": "幼狼的牙齿",
   "item.yqils_arknights.lappland_blade.jei_info": "拉普兰德的标志性武器",
   "item.yqils_arknights.lappland_blade.description": "击中附带 脆弱I 8秒，右键可进行80%伤害的远程攻击\n17次攻击后触发狼魂",
@@ -31,7 +37,7 @@
   "item.yqils_arknights.mlynar_newspaper.description": "使用获得30秒的未照耀的荣光",
 
   "effect.yqils_arknights.mlynar_power": "未照耀的荣光",
-  "effect.yqils_arknights.mlynar_power.description": "攻击范围扩大2格, 攻击力提升至400%(每击倒一名敌人时倍率-10%, 最多减少200%, 周围存在3名及以上敌人时攻击力提升至405%且受到的伤害减少25%",
+  "effect.yqils_arknights.mlynar_power.description": "攻击范围扩大2格, 攻击力提升至400%(每击倒一名敌人时倍率-10%, 最多减少200%), 周围存在3名及以上敌人时攻击力提升至405%且受到的伤害减少25%",
 
   "effect.yqils_arknights.lappland_blade_power": "狼魂",
   "effect.yqils_arknights.lappland_blade_power.description": "攻击力+120%，远程攻击额外发射一个投掷物，远程攻击不再降低攻击力",
@@ -54,8 +60,10 @@
   "effect.yqils_arknights.nc_deer_fan_power": "仙山去远",
   "effect.yqils_arknights.nc_deer_fan_power.description": "攻击速度乘1.5并获取26%伤害减免",
 
-  "jei.yqils_arknights.item_effect.title": "物品效果",
-  "jei.yqils_arknights.item_effect.gain_label": "效果获取",
-  "jei.yqils_arknights.item_effect.apply_label": "效果施加"
+  "item.yqils_arknights.nearl_shield": "玛嘉烈·临光的骑士盾",
+  "item.yqils_arknights.nearl_shield.descruption": "Shift右键获得40秒的急救模式",
+
+  "effect.yqils_arknights.nearl_shield_power": "急救模式",
+  "effect.yqils_arknights.nearl_shield_power.description": "每2.5秒回复33%攻击力的血量"
 
 }

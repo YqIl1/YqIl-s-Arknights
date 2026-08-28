@@ -3,17 +3,16 @@ package com.YqIl1.yqils_arknights.item.custom;
 import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.entity.custom.EyjafjallaWandProjectile;
 import com.YqIl1.yqils_arknights.sound.ModSound;
+import com.YqIl1.yqils_arknights.util.TimedActivation;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.client.renderer.EffectInstance;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -30,7 +29,8 @@ import java.util.List;
 
 public class EyjafjallaWandItem extends Item implements CrosshairCounterItem {
     private static final String VOLCANO_LAST_USED_KEY = "yqils_arknights:volcano_last_used";
-    public static final int VOLCANO_COOLDOWN_TICKS = 1600; // 80s * 20 ticks/sec
+    public static final int VOLCANO_DURATION_TICKS = 300; // 15s buff
+    public static final int VOLCANO_COOLDOWN_TICKS = 1600; // 80s, starts once the buff ends
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public EyjafjallaWandItem(Properties p_41383_) {
@@ -59,17 +59,11 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem {
 
         int cooldown = 8;
         if (!level.isClientSide) {
-            if (player.isShiftKeyDown()) {
-                CompoundTag tag = itemstack.getOrCreateTag();
-                long lastUsed = tag.getLong(VOLCANO_LAST_USED_KEY);
-                long elapsed = level.getGameTime() - lastUsed;
-
-                if (elapsed >= VOLCANO_COOLDOWN_TICKS) {
-                    player.addEffect(new MobEffectInstance(ModEffects.EYJAFJALLA_WAND_POWER.get(), 300, 0));
-                    tag.putLong(VOLCANO_LAST_USED_KEY, level.getGameTime());
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            ModSound.EYJAFJALLA_WAND_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-                }
+            if (player.isShiftKeyDown() && TimedActivation.isReady(itemstack, level, VOLCANO_LAST_USED_KEY, VOLCANO_DURATION_TICKS, VOLCANO_COOLDOWN_TICKS)) {
+                player.addEffect(new MobEffectInstance(ModEffects.EYJAFJALLA_WAND_POWER.get(), VOLCANO_DURATION_TICKS, 0));
+                TimedActivation.markActivated(itemstack, level, VOLCANO_LAST_USED_KEY);
+                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        ModSound.EYJAFJALLA_WAND_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
             }
             float rangedDamage = (float)player.getAttributeValue(Attributes.ATTACK_DAMAGE);
             if (hasPower) {
@@ -95,36 +89,10 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem {
         return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
     }
 
-    @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean isSelected) {
-        super.inventoryTick(stack, level, entity, slot, isSelected);
-        if (level.isClientSide || !(entity instanceof Player player)) {
-            return;
-        }
-        if (!player.hasEffect(ModEffects.EYJAFJALLA_WAND_POWER.get())) {
-            return;
-        }
-
-        CompoundTag tag = stack.getTag();
-        if (tag == null || !tag.contains(VOLCANO_LAST_USED_KEY)) {
-            return;
-        }
-
-        long lastUsed = tag.getLong(VOLCANO_LAST_USED_KEY);
-        long elapsed = level.getGameTime() - lastUsed;
-        if (elapsed < VOLCANO_COOLDOWN_TICKS) {
-            tag.putLong(VOLCANO_LAST_USED_KEY, lastUsed + 1);
-        }
-    }
-
     public static final int VOLCANO_COOLDOWN_SECONDS = VOLCANO_COOLDOWN_TICKS / 20;
 
     public static int getVolcanoElapsedSeconds(ItemStack stack, Level level) {
-        CompoundTag tag = stack.getTag();
-        if (tag == null) return VOLCANO_COOLDOWN_SECONDS;
-        long elapsedTicks = level.getGameTime() - tag.getLong(VOLCANO_LAST_USED_KEY);
-        long elapsedSeconds = elapsedTicks / 20;
-        return (int) Math.min(elapsedSeconds, VOLCANO_COOLDOWN_SECONDS);
+        return TimedActivation.getElapsedSeconds(stack, level, VOLCANO_LAST_USED_KEY, VOLCANO_DURATION_TICKS, VOLCANO_COOLDOWN_SECONDS);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.YqIl1.yqils_arknights.effect.custom.ImmolationEffect;
 import com.YqIl1.yqils_arknights.effect.custom.LapplandBladePowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.MlynarPowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.NCDeerFanPowerEffect;
+import com.YqIl1.yqils_arknights.effect.custom.NearlShieldPowerEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.registries.DeferredRegister;
@@ -40,4 +41,9 @@ public class ModEffects {
     // Granted by NC Deer Fan's hold-to-activate -- behavior TBD
     public static final RegistryObject<MobEffect> NC_DEER_FAN_POWER = MOB_EFFECTS.register("nc_deer_fan_power",
             () -> new NCDeerFanPowerEffect(MobEffectCategory.BENEFICIAL, 0xFAFAFA));
+
+    // Heals 33% of the wielder's own ATTACK_DAMAGE every 2.5s -- granted by Nearl's Shield's
+    // shift-right-click activation
+    public static final RegistryObject<MobEffect> NEARL_SHIELD_POWER = MOB_EFFECTS.register("nearl_shield_power",
+            () -> new NearlShieldPowerEffect(MobEffectCategory.BENEFICIAL, 0x8FD1E0));
 }

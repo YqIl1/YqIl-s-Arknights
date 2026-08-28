@@ -115,6 +115,12 @@ public class Yqils_arknights {
             // vanilla uses for the bow's "pulling" model swap
             event.enqueueWork(() -> ItemProperties.register(ModItems.IFRIT_FLAMETHROWER.get(), new ResourceLocation("using"),
                     (stack, level, entity, seed) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F));
+
+            // Vanilla only wires the "blocking" predicate up for the actual Items.SHIELD instance
+            // (ItemProperties.java), not the ShieldItem class generically -- drives the override in
+            // nearl_shield.json pointing at nearl_shield_blocking.json while raised.
+            event.enqueueWork(() -> ItemProperties.register(ModItems.NEARL_SHIELD.get(), new ResourceLocation("blocking"),
+                    (stack, level, entity, seed) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F));
         }
 
         @SubscribeEvent
