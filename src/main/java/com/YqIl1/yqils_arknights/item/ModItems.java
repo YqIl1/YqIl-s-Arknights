@@ -4,10 +4,7 @@ import com.YqIl1.yqils_arknights.block.ModBlocks;
 import com.YqIl1.yqils_arknights.Yqils_arknights;
 import com.YqIl1.yqils_arknights.item.custom.*;
 import com.YqIl1.yqils_arknights.sound.ModSound;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.item.*;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -46,4 +43,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> NCDEER_FAN = ITEMS.register("ncdeer_fan",
             () -> new NCDeerFanItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> NEARL_SHIELD = ITEMS.register("nearl_shield",
+            () -> new NearlShieldItem(new Item.Properties()));
 }

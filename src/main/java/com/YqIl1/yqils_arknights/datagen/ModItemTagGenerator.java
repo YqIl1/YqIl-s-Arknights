@@ -33,6 +33,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.WEAPONS).add(ModItems.LAPPLAND_BLADE.get());
         this.tag(ModTags.Items.WEAPONS).add(ModItems.EYJAFJALLA_WAND.get());
         this.tag(ModTags.Items.WEAPONS).add(ModItems.IFRIT_FLAMETHROWER.get());
+        this.tag(ModTags.Items.SUPPORTS).add(ModItems.NEARL_SHIELD.get());
 
         //Supports
         this.tag(ModTags.Items.SUPPORTS).add(ModItems.MLYNAR_NEWSPAPER.get());

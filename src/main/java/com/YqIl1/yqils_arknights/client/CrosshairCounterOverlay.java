@@ -22,21 +22,18 @@ public class CrosshairCounterOverlay implements IGuiOverlay {
             return;
         }
 
-        ItemStack mainHand = player.getMainHandItem();
-        ItemStack offHand = player.getOffhandItem();
-        ItemStack stack;
-        boolean offhand;
-        if (mainHand.getItem() instanceof CrosshairCounterItem) {
-            stack = mainHand;
-            offhand = false;
-        } else if (offHand.getItem() instanceof CrosshairCounterItem) {
-            stack = offHand;
-            offhand = true;
-        } else {
+        // Independent checks (not else-if) so a counter renders for BOTH hands at once when each
+        // holds a qualifying item -- e.g. a shield's cooldown in the off hand alongside a weapon's
+        // charge counter in the main hand.
+        renderHand(guiGraphics, screenWidth, screenHeight, player, player.getMainHandItem(), false);
+        renderHand(guiGraphics, screenWidth, screenHeight, player, player.getOffhandItem(), true);
+    }
+
+    private void renderHand(GuiGraphics guiGraphics, int screenWidth, int screenHeight, Player player, ItemStack stack, boolean offhand) {
+        if (!(stack.getItem() instanceof CrosshairCounterItem display)) {
             return;
         }
 
-        CrosshairCounterItem display = (CrosshairCounterItem) stack.getItem();
         String mainText = display.getCrosshairCounterText(stack, player.level());
         String secondaryText = display.getCrosshairSecondaryText(stack, player.level());
 

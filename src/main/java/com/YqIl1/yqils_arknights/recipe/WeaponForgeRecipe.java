@@ -45,6 +45,14 @@ public class WeaponForgeRecipe implements Recipe<SimpleContainer> {
         return true;
     }
 
+    // Crafted through the Weapon Forging Station's own screen, not the vanilla crafting-table recipe
+    // book -- isSpecial() = true tells ClientRecipeBook to skip recipe-book categorization for this
+    // recipe entirely, instead of falling into its "Unknown recipe category" warning path.
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
+
     @Override
     public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
         return output.copy();
@@ -90,8 +98,9 @@ public class WeaponForgeRecipe implements Recipe<SimpleContainer> {
 
         @Override
         public @Nullable WeaponForgeRecipe fromNetwork(ResourceLocation pRecopeId, FriendlyByteBuf pBuffer) {
-            NonNullList<Ingredient> input = NonNullList.withSize(pBuffer.readInt(), Ingredient.EMPTY);
-            for(int i = 0; i < pBuffer.readInt(); ++i) {
+            int size = pBuffer.readInt();
+            NonNullList<Ingredient> input = NonNullList.withSize(size, Ingredient.EMPTY);
+            for(int i = 0; i < size; ++i) {
                 input.set(i, Ingredient.fromNetwork(pBuffer));
             }
 
