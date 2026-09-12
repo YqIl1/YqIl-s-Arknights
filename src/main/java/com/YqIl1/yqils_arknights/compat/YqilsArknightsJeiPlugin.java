@@ -30,18 +30,6 @@ public class YqilsArknightsJeiPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-        registration.addIngredientInfo(
-                new ItemStack(ModItems.LAPPLAND_BLADE.get()),
-                VanillaTypes.ITEM_STACK,
-                Component.translatable("item.yqils_arknights.lappland_blade.jei_info")
-        );
-
-        registration.addIngredientInfo(
-                new ItemStack(ModItems.MLYNAR_NEWSPAPER.get()),
-                VanillaTypes.ITEM_STACK,
-                Component.translatable("item.yqils_arknights.mlynar_newspaper.jei_info")
-
-        );
 
         registration.addRecipes(WeaponForgingCatagory.RECIPE_TYPE,
                 recipeManager.getAllRecipesFor(WeaponForgeRecipe.Type.INSTANCE));

@@ -11,11 +11,24 @@
   "effect.yqils_arknights.fragile": "Fragile",
   "effect.yqils_arknights.fragile.description": "Takes 10% more damage from all sources, increase by 10% per level",
 
+  "item.minecraft.potion.effect.fragile": "Potion of Fragile",
+  "item.minecraft.splash_potion.effect.fragile": "Splash potion of Fragile",
+  "item.minecraft.lingering_potion.effect.fragile": "Lingering potion of Fragile",
 
+  "item.minecraft.potion.effect.strong_fragile": "Potion of Fragile II",
+  "item.minecraft.splash_potion.effect.strong_fragile": "Splash potion of Fragile II",
+  "item.minecraft.lingering_potion.effect.strong_fragile": "Lingering potion of Fragile II",
+
+  "item.minecraft.potion.effect.long_fragile": "Potion of Fragile",
+  "item.minecraft.splash_potion.effect.long_fragile": "Splash potion of Fragile",
+  "item.minecraft.lingering_potion.effect.long_fragile": "Lingering potion of Fragile",
+
+  "item.minecraft.tipped_arrow.effect.fragile": "Arrow of Fragile",
+  "item.minecraft.tipped_arrow.effect.strong_fragile": "Arrow of Fragile II",
+  "item.minecraft.tipped_arrow.effect.long_fragile": "Arrow of Fragile",
 
 
   "item.yqils_arknights.lappland_blade": "The Young Fang",
-  "item.yqils_arknights.lappland_blade.jei_info": "Lappland's iconic blade",
   "item.yqils_arknights.lappland_blade.description": "On hit apply Fragile I for 8 seconds. Right click to launch ranged attack at 80% of ATK\nTrigger Wolf Spirit after 17 attacks",
 
 
@@ -33,8 +46,7 @@
 
 
 
-  "item.yqils_arknights.mlynar_newspaper": "Newspaper",
-  "item.yqils_arknights.mlynar_newspaper.jei_info": "Mlynar's Newspaper",
+  "item.yqils_arknights.mlynar_newspaper": "Mlynar's Newspaper",
   "item.yqils_arknights.mlynar_newspaper.description": "Use to grant Unbrilliant Glory for 30s",
 
   "effect.yqils_arknights.mlynar_power": "Unbrilliant Glory",
@@ -61,10 +73,19 @@
   "effect.yqils_arknights.nc_deer_fan_power": "Return to the Immortal Mountain",
   "effect.yqils_arknights.nc_deer_fan_power.description": "Attack speed * 1.5 and gain 26% damage reduction from all sources",
 
-  "item.yqils_arknights.nearl_shield": "Margaret Nearl's knight's shield",
+  "item.yqils_arknights.nearl_shield": "Margaret Nearl's Knight's Shield",
   "item.yqils_arknights.nearl_shield.description": "Shift right click to grant First Aid Mode for 40s",
 
   "effect.yqils_arknights.nearl_shield_power": "First Aid Mode",
-  "effect.yqils_arknights.nearl_shield_power.description": "Heal equal to 33% of ATK every 2.5s"
+  "effect.yqils_arknights.nearl_shield_power.description": "Heal equal to 33% of ATK every 2.5s",
+
+  "item.yqils_arknights.prts": "PRTS",
+  "item.yqils_arknights.prts.description": "Use to activate all activatable skill in inventory",
+
+  "item.yqils_arknights.texas_blade": "Texas's Sword",
+  "item.yqils_arknights.texas_blade.description": "Use to trigger Sword Rain: Deals 170% ATK as magic damage twice to all nearby enemies and Stuns them for 3 seconds",
+
+  "effect.yqils_arknights.stun": "Stun",
+  "effect.yqils_arknights.stun.description": "Stun for the duration"
 
 }

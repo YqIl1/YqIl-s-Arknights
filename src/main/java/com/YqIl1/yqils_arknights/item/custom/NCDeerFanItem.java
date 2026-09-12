@@ -4,10 +4,10 @@ import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.sound.ModSound;
 import com.YqIl1.yqils_arknights.util.TimedActivation;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -16,11 +16,12 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class NCDeerFanItem extends Item implements CrosshairCounterItem {
+public class NCDeerFanItem extends Item implements CrosshairCounterItem, ActivatableSkillItem {
     private static final String NC_DEER_FAN_LAST_USED_KEY = "yqils_arknights:nc_deer_fan_last_used";
     public static final int NC_DEER_FAN_DURATION_TICKS = 400; // 20s buff
     public static final int NC_DEER_FAN_COOLDOWN_SECONDS = 40; // additional cooldown, starts once the buff ends
@@ -67,12 +68,8 @@ public class NCDeerFanItem extends Item implements CrosshairCounterItem {
     // fire on an early release) -- this is where the effect actually activates.
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (!level.isClientSide && entity instanceof Player player
-                && TimedActivation.isReady(stack, level, NC_DEER_FAN_LAST_USED_KEY, NC_DEER_FAN_DURATION_TICKS, NC_DEER_FAN_COOLDOWN_TICKS)) {
-            player.addEffect(new MobEffectInstance(ModEffects.NC_DEER_FAN_POWER.get(), NC_DEER_FAN_DURATION_TICKS, 0));
-            TimedActivation.markActivated(stack, level, NC_DEER_FAN_LAST_USED_KEY);
-            level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    ModSound.NC_DEER_FAN_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        if (!level.isClientSide && entity instanceof Player player) {
+            activateSkill(stack, level, player);
         }
         return stack;
     }
@@ -89,5 +86,30 @@ public class NCDeerFanItem extends Item implements CrosshairCounterItem {
     @Override
     public String getCrosshairCounterText(ItemStack stack, Level level) {
         return getNCDeerFanElapsedSeconds(stack, level) + "/" + NC_DEER_FAN_COOLDOWN_SECONDS;
+    }
+
+    @Override
+    public RegistryObject<MobEffect> getSkillEffect() {
+        return ModEffects.NC_DEER_FAN_POWER;
+    }
+
+    @Override
+    public int getSkillDurationTicks() {
+        return NC_DEER_FAN_DURATION_TICKS;
+    }
+
+    @Override
+    public int getSkillCooldownTicks() {
+        return NC_DEER_FAN_COOLDOWN_TICKS;
+    }
+
+    @Override
+    public String getSkillLastUsedKey() {
+        return NC_DEER_FAN_LAST_USED_KEY;
+    }
+
+    @Override
+    public RegistryObject<SoundEvent> getSkillSound() {
+        return ModSound.NC_DEER_FAN_POWER;
     }
 }

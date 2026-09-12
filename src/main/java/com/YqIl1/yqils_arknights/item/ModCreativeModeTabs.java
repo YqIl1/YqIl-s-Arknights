@@ -29,6 +29,8 @@ public class ModCreativeModeTabs {
                 output.accept(ModItems.IFRIT_FLAMETHROWER.get());
                 output.accept(ModItems.NCDEER_FAN.get());
                 output.accept(ModItems.NEARL_SHIELD.get());
+                output.accept(ModItems.PRTS.get());
+                output.accept(ModItems.TEXAS_BLADE.get());
 
             }).build());
 }

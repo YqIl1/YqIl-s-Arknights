@@ -12,6 +12,19 @@
   "effect.yqils_arknights.fragile.description": "承受任意来源的伤害提升10%，每级额外提升10%",
 
 
+  "item.minecraft.potion.effect.fragile": "脆弱药水",
+  "item.minecraft.splash_potion.effect.fragile": "喷溅型脆弱药水",
+  "item.minecraft.lingering_potion.effect.fragile": "滞留型脆弱药水",
+
+  "item.minecraft.potion.effect.strong_fragile": "脆弱药水",
+  "item.minecraft.splash_potion.effect.strong_fragile": "喷溅型脆弱药水",
+  "item.minecraft.lingering_potion.effect.strong_fragile": "滞留型脆弱药水",
+
+  "item.minecraft.potion.effect.long_fragile": "脆弱药水",
+  "item.minecraft.splash_potion.effect.long_fragile": "喷溅型脆弱药水",
+  "item.minecraft.lingering_potion.effect.long_fragile": "滞留型脆弱药水",
+
+
   "jei.yqils_arknights.item_effect.title": "物品效果",
   "jei.yqils_arknights.item_effect.gain_label": "效果获取",
   "jei.yqils_arknights.item_effect.apply_label": "效果施加",
@@ -19,7 +32,6 @@
 
 
   "item.yqils_arknights.lappland_blade": "幼狼的牙齿",
-  "item.yqils_arknights.lappland_blade.jei_info": "拉普兰德的标志性武器",
   "item.yqils_arknights.lappland_blade.description": "击中附带 脆弱I 8秒，右键可进行80%伤害的远程攻击\n17次攻击后触发狼魂",
 
 
@@ -32,8 +44,7 @@
   "gui.yqils_arknights.weapon_forging_station.start": "开始",
 
 
-  "item.yqils_arknights.mlynar_newspaper": "报纸",
-  "item.yqils_arknights.mlynar_newspaper.jei_info": "玛恩纳的报纸",
+  "item.yqils_arknights.mlynar_newspaper": "玛恩纳的报纸",
   "item.yqils_arknights.mlynar_newspaper.description": "使用获得30秒的未照耀的荣光",
 
   "effect.yqils_arknights.mlynar_power": "未照耀的荣光",
@@ -43,7 +54,7 @@
   "effect.yqils_arknights.lappland_blade_power.description": "攻击力+120%，远程攻击额外发射一个投掷物，远程攻击不再降低攻击力",
 
   "item.yqils_arknights.eyjafjalla_wand": "艾雅法拉的源石施术单元",
-  "item.yqils_arknights.eyjafjalla_wand.decription": "使用时进行远程攻击\nShift右键开启火山，持续15秒",
+  "item.yqils_arknights.eyjafjalla_wand.decription": "使用时进行远程攻击 \nShift右键开启火山，持续15秒",
 
   "effect.yqils_arknights.eyjafjalla_wand_power": "火山",
   "effect.yqils_arknights.eyjafjalla_wand_power.description": "距离提升; 攻击间隔缩短1.1秒; 远程攻击额外创造5发随机方向造成50%攻击力法术伤害的投掷物",
@@ -61,9 +72,18 @@
   "effect.yqils_arknights.nc_deer_fan_power.description": "攻击速度乘1.5并获取26%伤害减免",
 
   "item.yqils_arknights.nearl_shield": "玛嘉烈·临光的骑士盾",
-  "item.yqils_arknights.nearl_shield.descruption": "Shift右键获得40秒的急救模式",
+  "item.yqils_arknights.nearl_shield.description": "Shift右键获得40秒的急救模式",
 
   "effect.yqils_arknights.nearl_shield_power": "急救模式",
-  "effect.yqils_arknights.nearl_shield_power.description": "每2.5秒回复33%攻击力的血量"
+  "effect.yqils_arknights.nearl_shield_power.description": "每2.5秒回复33%攻击力的血量",
+
+  "item.yqils_arknights.prts": "PRTS",
+  "item.yqils_arknights.prts.description": "使用时激活所有已携带的可激活技能",
+
+  "item.yqils_arknights.texas_blade": "德克萨斯的剑",
+  "item.yqils_arknights.texas_blade.description": "使用触发剑雨：对周围所有敌人造成两次相当于攻击力170%的魔法伤害，并令击中目标晕眩3秒",
+
+  "effect.yqils_arknights.stun": "眩晕",
+  "effect.yqils_arknights.stun.description": "持续时间内眩晕"
 
 }
