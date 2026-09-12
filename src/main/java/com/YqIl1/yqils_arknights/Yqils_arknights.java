@@ -9,6 +9,7 @@ import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.entity.ModEntities;
 import com.YqIl1.yqils_arknights.item.ModCreativeModeTabs;
 import com.YqIl1.yqils_arknights.item.ModItems;
+import com.YqIl1.yqils_arknights.potion.ModPotions;
 import com.YqIl1.yqils_arknights.recipe.ModRecipes;
 import com.YqIl1.yqils_arknights.screen.ModMenuTypes;
 import com.YqIl1.yqils_arknights.screen.WeaponForgingStationScreen;
@@ -21,8 +22,14 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
@@ -70,7 +77,8 @@ public class Yqils_arknights {
         ModSound.SOUND_EVENTS.register(modEventBus);
         ModMenuTypes.MENUS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
-        ModRecipes.SERIALIZERS.register(modEventBus);
+        ModRecipes.register(modEventBus);
+        ModPotions.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -89,6 +97,27 @@ public class Yqils_arknights {
         LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
 
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+
+        // Awkward Potion + Glass Block -> Potion of Fragile. Splash/Lingering variants come for free
+        // via vanilla's generic gunpowder/dragon's-breath container conversion, no extra registration.
+        event.enqueueWork(() -> BrewingRecipeRegistry.addRecipe(
+                Ingredient.of(PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.AWKWARD)),
+                Ingredient.of(Items.GLASS),
+                PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.FRAGILE.get())));
+
+        // Potion of Fragile + Glowstone Dust -> Potion of Fragile II (amplifier 1, half duration),
+        // same shape as vanilla's own base-potion amplify mixes.
+        event.enqueueWork(() -> BrewingRecipeRegistry.addRecipe(
+                Ingredient.of(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.FRAGILE.get())),
+                Ingredient.of(Items.GLOWSTONE_DUST),
+                PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.FRAGILE_II.get())));
+
+        // Potion of Fragile + Redstone Dust -> Potion of Fragile (Extended duration), same shape as
+        // vanilla's own base-potion extend mixes.
+        event.enqueueWork(() -> BrewingRecipeRegistry.addRecipe(
+                Ingredient.of(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.FRAGILE.get())),
+                Ingredient.of(Items.REDSTONE),
+                PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.FRAGILE_LONG.get())));
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -127,6 +156,7 @@ public class Yqils_arknights {
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(ModEntities.LAPPLAND_BLADE_PROJECTILE.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(ModEntities.EYJAFJALLA_WAND_PROJECTILE.get(), ThrownItemRenderer::new);
+            event.registerEntityRenderer(ModEntities.TEXAS_BLADE_PROJECTILE.get(), ThrownItemRenderer::new);
             MenuScreens.register(ModMenuTypes.WEAPON_FORGING_MENU.get(), WeaponForgingStationScreen::new);
 
             event.registerBlockEntityRenderer(ModBlockEntities.WEAPON_FORGING_BE.get(), WeaponForgingStationBlockEntityRenderer::new);

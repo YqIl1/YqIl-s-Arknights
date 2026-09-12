@@ -46,4 +46,13 @@ public class ModItems {
 
     public static final RegistryObject<Item> NEARL_SHIELD = ITEMS.register("nearl_shield",
             () -> new NearlShieldItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> PRTS = ITEMS.register("prts",
+            () -> new PRTSItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> TEXAS_BLADE = ITEMS.register("texas_blade",
+            () -> new TexasBladeItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> TEXAS_BLADE_PROJECTILE = ITEMS.register("texas_blade_projectile",
+            () -> new Item(new Item.Properties()));
 }

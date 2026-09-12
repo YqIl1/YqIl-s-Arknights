@@ -8,6 +8,7 @@ import com.YqIl1.yqils_arknights.effect.custom.LapplandBladePowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.MlynarPowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.NCDeerFanPowerEffect;
 import com.YqIl1.yqils_arknights.effect.custom.NearlShieldPowerEffect;
+import com.YqIl1.yqils_arknights.effect.custom.StunEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.registries.DeferredRegister;
@@ -46,4 +47,8 @@ public class ModEffects {
     // shift-right-click activation
     public static final RegistryObject<MobEffect> NEARL_SHIELD_POWER = MOB_EFFECTS.register("nearl_shield_power",
             () -> new NearlShieldPowerEffect(MobEffectCategory.BENEFICIAL, 0x8FD1E0));
+
+    // Disables the target's AI for the effect's duration. G
+    public static final RegistryObject<MobEffect> STUN = MOB_EFFECTS.register("stun",
+            () -> new StunEffect(MobEffectCategory.HARMFUL, 0x888888));
 }

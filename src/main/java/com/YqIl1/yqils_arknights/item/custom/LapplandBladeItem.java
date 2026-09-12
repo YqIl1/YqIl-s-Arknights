@@ -25,7 +25,7 @@ public class LapplandBladeItem extends SwordItem implements CrosshairCounterItem
     public static final int POWER_EFFECT_DURATION_TICKS = 400;
 
     public LapplandBladeItem() {
-        super(Tiers.DIAMOND, 4, -2.4F, new Item.Properties().rarity(Rarity.EPIC));
+        super(Tiers.DIAMOND, 5, -2.4F, new Item.Properties().rarity(Rarity.EPIC));
     }
 
     @Override

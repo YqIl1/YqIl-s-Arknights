@@ -30,7 +30,8 @@ public record ItemEffectDisplay(ItemStack item, MobEffect effect, int durationTi
                 new ItemEffectDisplay(new ItemStack(ModItems.EYJAFJALLA_WAND.get()), ModEffects.EYJAFJALLA_WAND_POWER.get(), 300, Relation.GAIN),
                 new ItemEffectDisplay(new ItemStack(ModItems.NCDEER_FAN.get()), ModEffects.NC_DEER_FAN_POWER.get(), 400, Relation.GAIN),
                 new ItemEffectDisplay(new ItemStack(ModItems.IFRIT_FLAMETHROWER.get()), ModEffects.IMMOLATION.get(), IfritFlamethrowerItem.IMMOLATION_DURATION_TICKS, Relation.APPLY),
-                new ItemEffectDisplay(new ItemStack(ModItems.NEARL_SHIELD.get()), ModEffects.NEARL_SHIELD_POWER.get(), 800, Relation.GAIN)
+                new ItemEffectDisplay(new ItemStack(ModItems.NEARL_SHIELD.get()), ModEffects.NEARL_SHIELD_POWER.get(), 800, Relation.GAIN),
+                new ItemEffectDisplay(new ItemStack(ModItems.TEXAS_BLADE.get()), ModEffects.STUN.get(), 60, Relation.APPLY)
         );
     }
 }

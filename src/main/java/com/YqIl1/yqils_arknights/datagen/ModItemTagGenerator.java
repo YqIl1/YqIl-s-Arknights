@@ -27,17 +27,21 @@ public class ModItemTagGenerator extends ItemTagsProvider {
 
         //Sword
         this.tag(ItemTags.SWORDS).add(ModItems.LAPPLAND_BLADE.get());
+        this.tag(ItemTags.SWORDS).add(ModItems.TEXAS_BLADE.get());
 
 
         //Weapons
         this.tag(ModTags.Items.WEAPONS).add(ModItems.LAPPLAND_BLADE.get());
         this.tag(ModTags.Items.WEAPONS).add(ModItems.EYJAFJALLA_WAND.get());
         this.tag(ModTags.Items.WEAPONS).add(ModItems.IFRIT_FLAMETHROWER.get());
-        this.tag(ModTags.Items.SUPPORTS).add(ModItems.NEARL_SHIELD.get());
+        this.tag(ModTags.Items.WEAPONS).add(ModItems.NEARL_SHIELD.get());
+        this.tag(ModTags.Items.WEAPONS).add(ModItems.TEXAS_BLADE.get());
 
         //Supports
         this.tag(ModTags.Items.SUPPORTS).add(ModItems.MLYNAR_NEWSPAPER.get());
         this.tag(ModTags.Items.SUPPORTS).add(ModItems.NCDEER_FAN.get());
+        this.tag(ModTags.Items.SUPPORTS).add(ModItems.PRTS.get());
+        this.tag(ModTags.Items.SUPPORTS).add(ModItems.NEARL_SHIELD.get());
 
         //No Melee
         this.tag(ModTags.Items.NO_MELEE).add(ModItems.EYJAFJALLA_WAND.get());

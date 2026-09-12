@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class EyjafjallaWandItem extends Item implements CrosshairCounterItem {
+public class EyjafjallaWandItem extends Item implements CrosshairCounterItem, ActivatableSkillItem {
     private static final String VOLCANO_LAST_USED_KEY = "yqils_arknights:volcano_last_used";
     public static final int VOLCANO_DURATION_TICKS = 300; // 15s buff
     public static final int VOLCANO_COOLDOWN_TICKS = 1600; // 80s, starts once the buff ends
@@ -59,11 +59,8 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem {
 
         int cooldown = 8;
         if (!level.isClientSide) {
-            if (player.isShiftKeyDown() && TimedActivation.isReady(itemstack, level, VOLCANO_LAST_USED_KEY, VOLCANO_DURATION_TICKS, VOLCANO_COOLDOWN_TICKS)) {
-                player.addEffect(new MobEffectInstance(ModEffects.EYJAFJALLA_WAND_POWER.get(), VOLCANO_DURATION_TICKS, 0));
-                TimedActivation.markActivated(itemstack, level, VOLCANO_LAST_USED_KEY);
-                level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        ModSound.EYJAFJALLA_WAND_POWER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+            if (player.isShiftKeyDown()) {
+                activateSkill(itemstack, level, player);
             }
             float rangedDamage = (float)player.getAttributeValue(Attributes.ATTACK_DAMAGE);
             if (hasPower) {
@@ -98,6 +95,31 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem {
     @Override
     public String getCrosshairCounterText(ItemStack stack, Level level) {
         return getVolcanoElapsedSeconds(stack, level) + "/" + VOLCANO_COOLDOWN_SECONDS;
+    }
+
+    @Override
+    public net.minecraftforge.registries.RegistryObject<net.minecraft.world.effect.MobEffect> getSkillEffect() {
+        return ModEffects.EYJAFJALLA_WAND_POWER;
+    }
+
+    @Override
+    public int getSkillDurationTicks() {
+        return VOLCANO_DURATION_TICKS;
+    }
+
+    @Override
+    public int getSkillCooldownTicks() {
+        return VOLCANO_COOLDOWN_TICKS;
+    }
+
+    @Override
+    public String getSkillLastUsedKey() {
+        return VOLCANO_LAST_USED_KEY;
+    }
+
+    @Override
+    public net.minecraftforge.registries.RegistryObject<net.minecraft.sounds.SoundEvent> getSkillSound() {
+        return ModSound.EYJAFJALLA_WAND_POWER;
     }
 
     private EyjafjallaWandProjectile fireProjectile(Level level, Player player, float dmg, float xOffset, float yOffset, int lifetime) {

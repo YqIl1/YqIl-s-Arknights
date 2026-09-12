@@ -44,6 +44,12 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         WeaponForgeRecipeBuilder.weaponForging(ModItems.NEARL_SHIELD.get())
                 .save(pWriter, "nearl_shield_from_forging");
 
+        WeaponForgeRecipeBuilder.weaponForging(ModItems.PRTS.get())
+                .save(pWriter, "prts_from_forging");
+        WeaponForgeRecipeBuilder.weaponForging(ModItems.TEXAS_BLADE.get())
+                .save(pWriter, "texas_blade_from_forging");
+
+
 
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WEAPON_FORGING_STATION_ITEM.get())
