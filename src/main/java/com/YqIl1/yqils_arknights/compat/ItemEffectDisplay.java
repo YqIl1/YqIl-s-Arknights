@@ -26,6 +26,7 @@ public record ItemEffectDisplay(ItemStack item, MobEffect effect, int durationTi
         return List.of(
                 new ItemEffectDisplay(new ItemStack(ModItems.LAPPLAND_BLADE.get()), ModEffects.LAPPLAND_BLADE_POWER.get(), LapplandBladeItem.POWER_EFFECT_DURATION_TICKS, Relation.GAIN),
                 new ItemEffectDisplay(new ItemStack(ModItems.LAPPLAND_BLADE.get()), ModEffects.FRAGILE.get(), 160, Relation.APPLY),
+                new ItemEffectDisplay(new ItemStack(ModItems.LAPPLAND_BLADE.get()), ModEffects.SILENCE.get(), LapplandBladeItem.SILENCE_DURATION_TICKS, Relation.APPLY),
                 new ItemEffectDisplay(new ItemStack(ModItems.MLYNAR_NEWSPAPER.get()), ModEffects.MLYNAR_POWER.get(), 600, Relation.GAIN),
                 new ItemEffectDisplay(new ItemStack(ModItems.EYJAFJALLA_WAND.get()), ModEffects.EYJAFJALLA_WAND_POWER.get(), 300, Relation.GAIN),
                 new ItemEffectDisplay(new ItemStack(ModItems.NCDEER_FAN.get()), ModEffects.NC_DEER_FAN_POWER.get(), 400, Relation.GAIN),

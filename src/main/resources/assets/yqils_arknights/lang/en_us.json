@@ -29,7 +29,7 @@
 
 
   "item.yqils_arknights.lappland_blade": "The Young Fang",
-  "item.yqils_arknights.lappland_blade.description": "On hit apply Fragile I for 8 seconds. Right click to launch ranged attack at 80% of ATK\nTrigger Wolf Spirit after 17 attacks",
+  "item.yqils_arknights.lappland_blade.description": "On hit apply Fragile I and Silence for 8 seconds. Right click to launch ranged attack at 80% of ATK\nTrigger Wolf Spirit after 17 attacks",
 
 
   "item.yqils_arknights.ambiguous_morality_music_disc": "Ambiguous Morality",
@@ -86,6 +86,12 @@
   "item.yqils_arknights.texas_blade.description": "Use to trigger Sword Rain: Deals 170% ATK as magic damage twice to all nearby enemies and Stuns them for 3 seconds",
 
   "effect.yqils_arknights.stun": "Stun",
-  "effect.yqils_arknights.stun.description": "Stun for the duration"
+  "effect.yqils_arknights.stun.description": "Stun for the duration",
 
+  "item.yqils_arknights.typhon_greatbow": "Typhon's Greatbow",
+  "item.yqils_arknights.typhon_greatbow.description": "Shift right click to trigger \"Eternal Hunt\": Immediately marks a target within 10 block radius with most health, Attack Interval lengthens significantly, and attacks become a hail of arrows aimed at the marked target; the hail of arrows will randomly strike enemies around the marked target, dealing 5 hits of 175% ATK + arrow damage as Physical damage and stunning targets hit 0.4 seconds\nSkill activation grants 10 ammo and the skill ends when all ammo are used\nShift right click again during the skill to end it early",
+  "entity.yqils_arknights.typhon_lock_circle": "Typhon Lock-on Marker",
+
+  "effect.yqils_arknights.silence": "Silence",
+  "effect.yqils_arknights.silence.description": "Loses special abilities and beneficial effects"
 }

@@ -23,6 +23,7 @@ public class LapplandBladeItem extends SwordItem implements CrosshairCounterItem
     private static final String HIT_COUNTER_KEY = "yqils_arknights:hit_counter";
     public static final int POWER_THRESHOLD = 17;
     public static final int POWER_EFFECT_DURATION_TICKS = 400;
+    public static final int SILENCE_DURATION_TICKS = 160; // 8 s, on every hit (melee and the ranged-attack projectile)
 
     public LapplandBladeItem() {
         super(Tiers.DIAMOND, 5, -2.4F, new Item.Properties().rarity(Rarity.EPIC));
@@ -32,6 +33,7 @@ public class LapplandBladeItem extends SwordItem implements CrosshairCounterItem
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (!target.level().isClientSide) {
             target.addEffect(new MobEffectInstance(ModEffects.FRAGILE.get(), 160, 0));
+            target.addEffect(new MobEffectInstance(ModEffects.SILENCE.get(), SILENCE_DURATION_TICKS, 0));
 
             SoundEvent meleeSound = attacker.hasEffect(ModEffects.LAPPLAND_BLADE_POWER.get())
                     ? ModSound.LAPPLAND_BLADE_POWER_MELEE.get()

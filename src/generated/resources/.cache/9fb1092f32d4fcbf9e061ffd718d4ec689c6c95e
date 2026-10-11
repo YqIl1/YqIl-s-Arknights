@@ -1,4 +1,4 @@
-// 1.20.1	2026-09-06T04:23:57.635617	Recipes
+// 1.20.1	2026-10-11T00:28:18.66723	Recipes
 847e715e1cb7890e5542055afc08b7b31e221ca5 data/yqils_arknights/advancements/recipes/misc/gear_base.json
 6ad40861626de92f168fc368f63789b6c801783b data/yqils_arknights/advancements/recipes/misc/weapon_forging_station.json
 7d8889b5b98d04469e560f0a0e4afdbb50d07394 data/yqils_arknights/recipes/eyjafjala_wand_from_forging.json
@@ -9,4 +9,6 @@ f1b0d5fd8ca5a13f30f10b85130bf820cd8c5744 data/yqils_arknights/recipes/lappland_b
 5157237e3fd72abb7547b6ca3e18b56e3c5e73c6 data/yqils_arknights/recipes/ncdeer_fan_from_forging.json
 1faec1db2da201c2b3b48e74ecf84334897426fa data/yqils_arknights/recipes/nearl_shield_from_forging.json
 e787e8c85f4da2d64d3f58930bfc2aa4fc9a0d3a data/yqils_arknights/recipes/prts_from_forging.json
+2000bdf481f1d435958647ede91e15040dcd358b data/yqils_arknights/recipes/texas_blade_from_forging.json
+7559986c1de5aaad279f1f063435b3dfff00343a data/yqils_arknights/recipes/typhon_greatbow_from_forging.json
 b3f65f1e747ffb247f77cf0db3cb97f7b3415f75 data/yqils_arknights/recipes/weapon_forging_station.json

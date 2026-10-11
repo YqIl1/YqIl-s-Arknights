@@ -31,6 +31,7 @@ public class ModCreativeModeTabs {
                 output.accept(ModItems.NEARL_SHIELD.get());
                 output.accept(ModItems.PRTS.get());
                 output.accept(ModItems.TEXAS_BLADE.get());
+                output.accept(ModItems.TYPHON_GREATBOW.get());
 
             }).build());
 }

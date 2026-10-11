@@ -70,6 +70,7 @@ public class LapplandBladeProjectile extends ThrowableItemProjectile {
         if (!this.level().isClientSide) {
             if (target instanceof LivingEntity livingTarget) {
                 livingTarget.addEffect(new MobEffectInstance(ModEffects.FRAGILE.get(), 160, 0));
+                livingTarget.addEffect(new MobEffectInstance(ModEffects.SILENCE.get(), com.YqIl1.yqils_arknights.item.custom.LapplandBladeItem.SILENCE_DURATION_TICKS, 0));
             }
 
             // The projectile doesn't carry a reference to the exact stack that fired it, so this counts

@@ -36,6 +36,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.WEAPONS).add(ModItems.IFRIT_FLAMETHROWER.get());
         this.tag(ModTags.Items.WEAPONS).add(ModItems.NEARL_SHIELD.get());
         this.tag(ModTags.Items.WEAPONS).add(ModItems.TEXAS_BLADE.get());
+        this.tag(ModTags.Items.WEAPONS).add(ModItems.TYPHON_GREATBOW.get());
 
         //Supports
         this.tag(ModTags.Items.SUPPORTS).add(ModItems.MLYNAR_NEWSPAPER.get());
@@ -46,5 +47,9 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         //No Melee
         this.tag(ModTags.Items.NO_MELEE).add(ModItems.EYJAFJALLA_WAND.get());
         this.tag(ModTags.Items.NO_MELEE).add(ModItems.IFRIT_FLAMETHROWER.get());
+        this.tag(ModTags.Items.NO_MELEE).add(ModItems.TYPHON_GREATBOW.get());
+
+        //ranged
+        this.tag(ModTags.Items.RANGED).add(ModItems.TYPHON_GREATBOW.get());
     }
 }

@@ -55,4 +55,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> TEXAS_BLADE_PROJECTILE = ITEMS.register("texas_blade_projectile",
             () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> TYPHON_GREATBOW = ITEMS.register("typhon_greatbow",
+            () -> new TyphonGreatbowItem(new Item.Properties()));
 }

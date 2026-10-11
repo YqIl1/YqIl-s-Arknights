@@ -24,6 +24,11 @@
   "item.minecraft.splash_potion.effect.long_fragile": "喷溅型脆弱药水",
   "item.minecraft.lingering_potion.effect.long_fragile": "滞留型脆弱药水",
 
+  "item.minecraft.tipped_arrow.effect.fragile": "脆弱之箭",
+  "item.minecraft.tipped_arrow.effect.strong_fragile": "脆弱之箭",
+  "item.minecraft.tipped_arrow.effect.long_fragile": "脆弱之箭",
+
+
 
   "jei.yqils_arknights.item_effect.title": "物品效果",
   "jei.yqils_arknights.item_effect.gain_label": "效果获取",
@@ -32,7 +37,7 @@
 
 
   "item.yqils_arknights.lappland_blade": "幼狼的牙齿",
-  "item.yqils_arknights.lappland_blade.description": "击中附带 脆弱I 8秒，右键可进行80%伤害的远程攻击\n17次攻击后触发狼魂",
+  "item.yqils_arknights.lappland_blade.description": "击中附带 脆弱I和沉默 8秒，右键可进行80%伤害的远程攻击\n17次攻击后触发狼魂",
 
 
   "item.yqils_arknights.ambiguous_morality_music_disc": "Ambiguous Morality",
@@ -84,6 +89,12 @@
   "item.yqils_arknights.texas_blade.description": "使用触发剑雨：对周围所有敌人造成两次相当于攻击力170%的魔法伤害，并令击中目标晕眩3秒",
 
   "effect.yqils_arknights.stun": "眩晕",
-  "effect.yqils_arknights.stun.description": "持续时间内眩晕"
+  "effect.yqils_arknights.stun.description": "持续时间内眩晕",
 
+  "item.yqils_arknights.typhon_greatbow": "提丰的巨弓",
+  "item.yqils_arknights.typhon_greatbow.description": "Shift右键触发“永恒狩猎”：立刻标记10格内血量最高的一名目标，攻击间隔增加，攻击变为对标记目标发射一轮箭雨；箭雨会随机攻击标记目标周围的敌人，共造成5次相当于攻击力175%+箭矢伤害的物理伤害并使目标晕眩0.4秒\n装有10发弹药，打完后结束\n技能期间再次Shift右键可提前结束技能",
+  "entity.yqils_arknights.typhon_lock_circle": "提丰锁定标记",
+
+  "effect.yqils_arknights.silence": "沉默",
+  "effect.yqils_arknights.silence.description": "失去特殊能力和增益效果"
 }

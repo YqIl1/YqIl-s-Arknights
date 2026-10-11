@@ -157,6 +157,7 @@ public class Yqils_arknights {
             event.registerEntityRenderer(ModEntities.LAPPLAND_BLADE_PROJECTILE.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(ModEntities.EYJAFJALLA_WAND_PROJECTILE.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(ModEntities.TEXAS_BLADE_PROJECTILE.get(), ThrownItemRenderer::new);
+            event.registerEntityRenderer(ModEntities.TYPHON_LOCK_CIRCLE.get(), com.YqIl1.yqils_arknights.client.TyphonLockCircleRenderer::new);
             MenuScreens.register(ModMenuTypes.WEAPON_FORGING_MENU.get(), WeaponForgingStationScreen::new);
 
             event.registerBlockEntityRenderer(ModBlockEntities.WEAPON_FORGING_BE.get(), WeaponForgingStationBlockEntityRenderer::new);

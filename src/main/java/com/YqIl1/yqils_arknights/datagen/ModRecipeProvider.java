@@ -48,6 +48,8 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .save(pWriter, "prts_from_forging");
         WeaponForgeRecipeBuilder.weaponForging(ModItems.TEXAS_BLADE.get())
                 .save(pWriter, "texas_blade_from_forging");
+        WeaponForgeRecipeBuilder.weaponForging(ModItems.TYPHON_GREATBOW.get())
+                .save(pWriter, "typhon_greatbow_from_forging");
 
 
 

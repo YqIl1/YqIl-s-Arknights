@@ -111,5 +111,19 @@
         "name": "yqils_arknights:nearl_shield_power_heal"
       }
     ]
+  },
+  "typhon_greatbow_power_draw": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:typhon_greatbow_power_draw"
+      }
+    ]
+  },
+  "typhon_greatbow_power_hit": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:typhon_greatbow_power_hit"
+      }
+    ]
   }
 }

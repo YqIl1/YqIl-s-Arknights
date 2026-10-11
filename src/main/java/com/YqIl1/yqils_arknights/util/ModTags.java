@@ -20,7 +20,7 @@ public class ModTags {
         public static final TagKey<Item> WEAPONS = tag("weapons");
         public static final TagKey<Item> SUPPORTS = tag("supports");
         public static final TagKey<Item> NO_MELEE = tag("no_melee");
-
+        public static final TagKey<Item> RANGED = tag("ranged");
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(Yqils_arknights.MODID, name));
         }

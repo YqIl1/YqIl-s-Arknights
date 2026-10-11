@@ -51,4 +51,8 @@ public class ModEffects {
     // Disables the target's AI for the effect's duration. G
     public static final RegistryObject<MobEffect> STUN = MOB_EFFECTS.register("stun",
             () -> new StunEffect(MobEffectCategory.HARMFUL, 0x888888));
+
+    // Applied by Lappland's Blade (The Young Fang). Behaviour lives in ModEventHandlers.
+    public static final RegistryObject<MobEffect> SILENCE = MOB_EFFECTS.register("silence",
+            () -> new com.YqIl1.yqils_arknights.effect.custom.SilenceEffect(MobEffectCategory.HARMFUL, 0xA0A5AD));
 }
