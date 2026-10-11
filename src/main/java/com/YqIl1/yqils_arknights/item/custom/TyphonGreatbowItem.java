@@ -404,6 +404,11 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
                 return living.position();
             }
         }
+        // Target gone: the lock circle drops to the ground, so rain on wherever it is now.
+        if (tag.hasUUID(LOCK_CIRCLE_KEY) && level.getEntity(tag.getUUID(LOCK_CIRCLE_KEY)) instanceof TyphonLockCircleEntity circle) {
+            saveLockPos(tag, circle.position());
+            return circle.position();
+        }
         return new Vec3(tag.getDouble(LOCK_X_KEY), tag.getDouble(LOCK_Y_KEY), tag.getDouble(LOCK_Z_KEY));
     }
 
