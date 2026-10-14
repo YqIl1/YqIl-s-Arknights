@@ -58,7 +58,10 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
     public static final int SKILL_COOLDOWN_SECONDS = 80;
     public static final int SKILL_COOLDOWN_TICKS = SKILL_COOLDOWN_SECONDS * 20;
     public static final int SILENCE_DURATION_TICKS = 5 * 20;
-    private static final int MIN_THROW_CHARGE_TICKS = 20; // 1 s per throw
+    private static final int MIN_THROW_CHARGE_TICKS = 14; // 0.7 s per throw
+    // Pause after each throw before the next charge starts. Implemented by restarting the hold this many
+    // ticks "early", so the elapsed charge is negative during the pause.
+    public static final int THROW_PAUSE_TICKS = 4; // 0.2 s
     private static final float THROW_PITCH_UP_DEGREES = 5.0F; // aim a little above the crosshair
     private static final double THROW_HEIGHT_OFFSET = 0.1D; // spawn a little above the default (eye - 0.1)
 
@@ -133,11 +136,7 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
             if (stack.getDamageValue() >= stack.getMaxDamage() - 1) {
                 return InteractionResultHolder.fail(stack); // same as the trident: don't throw a breaking spear
             }
-            player.startUsingItem(hand);
-            if (!level.isClientSide) {
-                level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        ModSound.CEOBE_SPEAR_POWER_CHARGE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-            }
+            player.startUsingItem(hand); // charge sound plays from tickThrowCharge when the charge starts
             return InteractionResultHolder.consume(stack);
         }
         if (level.isClientSide) {
@@ -163,18 +162,23 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
     // (1 s) the server throws a projectile, and both sides restart the charge by
     // returning a fresh duration -- so holding right click keeps throwing. Letting go early does nothing.
     public int tickThrowCharge(ItemStack stack, Player player, int remaining) {
-        if (this.getUseDuration(stack) - remaining < MIN_THROW_CHARGE_TICKS) return remaining;
-        if (!player.hasEffect(ModEffects.CEOBE_POWER.get())) return remaining; // skill ended mid-hold: just hold
-        if (stack.getDamageValue() >= stack.getMaxDamage() - 1) return remaining; // don't break the spear
-
+        int elapsed = this.getUseDuration(stack) - remaining;
         Level level = player.level();
-        if (!level.isClientSide) {
-            throwSpear(stack, level, player);
+        if (elapsed < 0) return remaining; // pause after a throw -- nothing charges yet
+        if (elapsed == 0 && !level.isClientSide && player.hasEffect(ModEffects.CEOBE_POWER.get())) {
+            // A charge is starting (first press, or the pause after a throw just ended).
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     ModSound.CEOBE_SPEAR_POWER_CHARGE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
+        if (elapsed < MIN_THROW_CHARGE_TICKS) return remaining;
+        if (!player.hasEffect(ModEffects.CEOBE_POWER.get())) return remaining; // skill ended mid-hold: just hold
+        if (stack.getDamageValue() >= stack.getMaxDamage() - 1) return remaining; // don't break the spear
+
+        if (!level.isClientSide) {
+            throwSpear(stack, level, player);
+        }
         player.awardStat(Stats.ITEM_USED.get(this));
-        return this.getUseDuration(stack);
+        return this.getUseDuration(stack) + THROW_PAUSE_TICKS;
     }
 
     // Spawns a separate projectile carrying the thrower's current ATTACK_DAMAGE (so the skill's +210%

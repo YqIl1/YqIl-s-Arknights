@@ -1,12 +1,11 @@
 {
-  "gui_light": "front",
   "credit": "Made with Blockbench",
   "parent": "builtin/entity",
   "display": {
     "thirdperson_righthand": {
       "translation": [
         0,
-        -1,
+        5.5,
         1.5
       ],
       "scale": [
@@ -18,8 +17,13 @@
     "thirdperson_lefthand": {
       "translation": [
         0,
-        -1,
+        5.5,
         1.5
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
       ]
     },
     "firstperson_righthand": {
