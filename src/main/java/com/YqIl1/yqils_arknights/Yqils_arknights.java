@@ -75,6 +75,7 @@ public class Yqils_arknights {
         ModEntities.ENTITY_TYPES.register(modEventBus);
 
         ModSound.SOUND_EVENTS.register(modEventBus);
+        com.YqIl1.yqils_arknights.particle.ModParticles.PARTICLE_TYPES.register(modEventBus);
         ModMenuTypes.MENUS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         ModRecipes.register(modEventBus);
@@ -89,6 +90,7 @@ public class Yqils_arknights {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         // Some common setup code
+        event.enqueueWork(com.YqIl1.yqils_arknights.network.ModNetwork::register);
         LOGGER.info("HELLO FROM COMMON SETUP");
         LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
 
@@ -158,9 +160,16 @@ public class Yqils_arknights {
             event.registerEntityRenderer(ModEntities.EYJAFJALLA_WAND_PROJECTILE.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(ModEntities.TEXAS_BLADE_PROJECTILE.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(ModEntities.TYPHON_LOCK_CIRCLE.get(), com.YqIl1.yqils_arknights.client.TyphonLockCircleRenderer::new);
+            event.registerEntityRenderer(ModEntities.THROWN_CEOBE_SPEAR.get(), com.YqIl1.yqils_arknights.client.ThrownCeobeSpearRenderer::new);
             MenuScreens.register(ModMenuTypes.WEAPON_FORGING_MENU.get(), WeaponForgingStationScreen::new);
 
             event.registerBlockEntityRenderer(ModBlockEntities.WEAPON_FORGING_BE.get(), WeaponForgingStationBlockEntityRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void registerParticleProviders(net.minecraftforge.client.event.RegisterParticleProvidersEvent event) {
+            event.registerSpriteSet(com.YqIl1.yqils_arknights.particle.ModParticles.TYPHON_STAR.get(),
+                    com.YqIl1.yqils_arknights.client.TyphonStarParticle.Provider::new);
         }
 
         @SubscribeEvent

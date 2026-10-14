@@ -89,9 +89,14 @@
   "effect.yqils_arknights.stun.description": "Stun for the duration",
 
   "item.yqils_arknights.typhon_greatbow": "Typhon's Greatbow",
-  "item.yqils_arknights.typhon_greatbow.description": "Shift right click to trigger \"Eternal Hunt\": Immediately marks a target within 10 block radius with most health, Attack Interval lengthens significantly, and attacks become a hail of arrows aimed at the marked target; the hail of arrows will randomly strike enemies around the marked target, dealing 5 hits of 175% ATK + arrow damage as Physical damage and stunning targets hit 0.4 seconds\nSkill activation grants 10 ammo and the skill ends when all ammo are used\nShift right click again during the skill to end it early",
+  "item.yqils_arknights.typhon_greatbow.description": "Shift left click to trigger \"Eternal Hunt\": Immediately marks a target within 10 block radius with most health, Attack Interval lengthens significantly, and attacks become a hail of arrows aimed at the marked target; the hail of arrows will randomly strike enemies around the marked target, dealing 5 hits of 175% ATK + arrow damage as Physical damage and stunning targets hit 0.4 seconds\nSkill activation grants 10 ammo and the skill ends when all ammo are used\nShift left click again during the skill to end it early",
   "entity.yqils_arknights.typhon_lock_circle": "Typhon Lock-on Marker",
 
   "effect.yqils_arknights.silence": "Silence",
-  "effect.yqils_arknights.silence.description": "Loses special abilities and beneficial effects"
+  "effect.yqils_arknights.silence.description": "Loses special abilities and beneficial effects",
+  "item.yqils_arknights.ceobe_spear": "Really Heavy Spear",
+  "item.yqils_arknights.ceobe_spear.description": "Right click to gain \"Really Heavy Spear\" for 60 seconds, cooldown 80 seconds",
+  "effect.yqils_arknights.ceobe_power": "\"Really Heavy Spear\"",
+  "effect.yqils_arknights.ceobe_power.description": "ATK +210%, attacks silence targets for 5 seconds, the spear can be thrown",
+  "entity.yqils_arknights.thrown_ceobe_spear": "Really Heavy Spear"
 }

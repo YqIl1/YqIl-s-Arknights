@@ -37,7 +37,7 @@
 
 
   "item.yqils_arknights.lappland_blade": "幼狼的牙齿",
-  "item.yqils_arknights.lappland_blade.description": "击中附带 脆弱I和沉默 8秒，右键可进行80%伤害的远程攻击\n17次攻击后触发狼魂",
+  "item.yqils_arknights.lappland_blade.description": "击中附带脆弱I和沉默8秒，\n右键可进行80%伤害的远程攻击\n17次攻击后触发狼魂",
 
 
   "item.yqils_arknights.ambiguous_morality_music_disc": "Ambiguous Morality",
@@ -59,7 +59,7 @@
   "effect.yqils_arknights.lappland_blade_power.description": "攻击力+120%，远程攻击额外发射一个投掷物，远程攻击不再降低攻击力",
 
   "item.yqils_arknights.eyjafjalla_wand": "艾雅法拉的源石施术单元",
-  "item.yqils_arknights.eyjafjalla_wand.decription": "使用时进行远程攻击 \nShift右键开启火山，持续15秒",
+  "item.yqils_arknights.eyjafjalla_wand.decription": "使用时进行远程攻击\nShift右键开启火山，持续15秒",
 
   "effect.yqils_arknights.eyjafjalla_wand_power": "火山",
   "effect.yqils_arknights.eyjafjalla_wand_power.description": "距离提升; 攻击间隔缩短1.1秒; 远程攻击额外创造5发随机方向造成50%攻击力法术伤害的投掷物",
@@ -92,9 +92,14 @@
   "effect.yqils_arknights.stun.description": "持续时间内眩晕",
 
   "item.yqils_arknights.typhon_greatbow": "提丰的巨弓",
-  "item.yqils_arknights.typhon_greatbow.description": "Shift右键触发“永恒狩猎”：立刻标记10格内血量最高的一名目标，攻击间隔增加，攻击变为对标记目标发射一轮箭雨；箭雨会随机攻击标记目标周围的敌人，共造成5次相当于攻击力175%+箭矢伤害的物理伤害并使目标晕眩0.4秒\n装有10发弹药，打完后结束\n技能期间再次Shift右键可提前结束技能",
+  "item.yqils_arknights.typhon_greatbow.description": "Shift左键触发“永恒狩猎”：立刻标记10格内血量最高的一名目标，攻击间隔增加，攻击变为对标记目标发射一轮箭雨；箭雨会随机攻击标记目标周围的敌人，共造成5次相当于攻击力175%+箭矢伤害的物理伤害并使目标晕眩0.4秒\n装有10发弹药，打完后结束\n技能期间再次Shift左键可提前结束技能",
   "entity.yqils_arknights.typhon_lock_circle": "提丰锁定标记",
 
   "effect.yqils_arknights.silence": "沉默",
-  "effect.yqils_arknights.silence.description": "失去特殊能力和增益效果"
+  "effect.yqils_arknights.silence.description": "失去特殊能力和增益效果",
+  "item.yqils_arknights.ceobe_spear": "很重的枪",
+  "item.yqils_arknights.ceobe_spear.description": "右键获得“很重的枪”，持续60秒，冷却80秒",
+  "effect.yqils_arknights.ceobe_power": "“很重的枪”",
+  "effect.yqils_arknights.ceobe_power.description": "攻击力+210%，攻击使目标沉默5秒，长枪可以投掷",
+  "entity.yqils_arknights.thrown_ceobe_spear": "很重的枪"
 }

@@ -2,11 +2,13 @@ package com.YqIl1.yqils_arknights.item.custom;
 
 import com.YqIl1.yqils_arknights.effect.ModEffects;
 import com.YqIl1.yqils_arknights.entity.custom.TexasBladeProjectile;
+import com.YqIl1.yqils_arknights.sound.ModSound;
 import com.YqIl1.yqils_arknights.util.TimedActivation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffect;
@@ -68,6 +70,11 @@ public class TexasBladeItem extends SwordItem implements CrosshairCounterItem, A
         }
 
         TimedActivation.markActivated(stack, level, SWORDRAIN_LAST_USED_KEY);
+        // This override replaces the interface default, which is where the skill sound normally plays.
+        RegistryObject<SoundEvent> sound = getSkillSound();
+        if (sound != null) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), sound.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        }
         strikeNearbyMobs(level, player);
         // The second wave can't happen synchronously (needs to wait 2 ticks), so queue it via NBT and
         // pick it up in inventoryTick below instead.
@@ -143,7 +150,17 @@ public class TexasBladeItem extends SwordItem implements CrosshairCounterItem, A
 
     @Override
     public RegistryObject<SoundEvent> getSkillSound() {
-        return ActivatableSkillItem.super.getSkillSound();
+        return ModSound.TEXAS_BLADE_POWER;
+    }
+
+    // Texas's own swing sound on every melee hit (heard by nearby players), on top of vanilla's.
+    @Override
+    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        if (!target.level().isClientSide) {
+            attacker.level().playSound(null, attacker.getX(), attacker.getY(), attacker.getZ(),
+                    ModSound.TEXAS_BLADE_MELEE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        }
+        return super.hurtEnemy(stack, target, attacker);
     }
 
     public static int getSwordrainElapsedSeconds(ItemStack stack, Level level) {

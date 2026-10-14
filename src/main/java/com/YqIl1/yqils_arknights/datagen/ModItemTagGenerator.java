@@ -37,6 +37,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.WEAPONS).add(ModItems.NEARL_SHIELD.get());
         this.tag(ModTags.Items.WEAPONS).add(ModItems.TEXAS_BLADE.get());
         this.tag(ModTags.Items.WEAPONS).add(ModItems.TYPHON_GREATBOW.get());
+        this.tag(ModTags.Items.WEAPONS).add(ModItems.CEOBE_SPEAR.get());
 
         //Supports
         this.tag(ModTags.Items.SUPPORTS).add(ModItems.MLYNAR_NEWSPAPER.get());

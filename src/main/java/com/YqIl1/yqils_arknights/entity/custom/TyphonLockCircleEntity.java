@@ -21,10 +21,14 @@ import java.util.UUID;
 
 // Purely visual marker for Typhon's Greatbow lock-on: sits at the locked enemy's feet and follows it every
 // tick. If the target dies or unloads it falls from where the target was last seen and rests on the ground
-// (the bow reads its position, so the remaining skill arrows rain there). It's a server entity so every nearby player sees it; it's never saved to disk.
+// (the bow reads its position, so the remaining skill arrows rain there). It's a server entity so every nearby
+// player sees it.
 //
-// Lifetime: the bow discards it when the lock ends (last shot / cancel). As a safety net it also removes
-// itself if its owner is gone or no longer carries a bow whose lock points at this circle.
+// Lifetime: it is saved with the world (target, owner, fall speed) and only goes away when the skill ends --
+// the bow discards it on the last shot / cancel. Safety net: while its owner is ONLINE and carries no bow whose
+// lock points at this circle (lock already ended, or the bow was dropped), it removes itself; if the bow comes
+// back with the lock still active, the bow spawns a fresh circle (TyphonGreatbowItem.inventoryTick). While the
+// owner is offline it just stays.
 public class TyphonLockCircleEntity extends Entity {
     private static final int OWNER_CHECK_INTERVAL = 10; // ticks
     // Falling once the target is gone (same feel as vanilla item/arrow gravity).
@@ -44,10 +48,15 @@ public class TyphonLockCircleEntity extends Entity {
     }
 
     public TyphonLockCircleEntity(Level level, LivingEntity target, Player owner) {
+        this(level, target.getUUID(), target.position(), owner);
+    }
+
+    // Also used to re-create a circle for a lock whose circle went missing (target may already be dead).
+    public TyphonLockCircleEntity(Level level, @Nullable UUID targetId, Vec3 pos, Player owner) {
         this(ModEntities.TYPHON_LOCK_CIRCLE.get(), level);
-        this.targetId = target.getUUID();
+        this.targetId = targetId;
         this.ownerId = owner.getUUID();
-        this.setPos(target.getX(), target.getY(), target.getZ());
+        this.setPos(pos.x, pos.y, pos.z);
     }
 
     @Override
@@ -92,7 +101,7 @@ public class TyphonLockCircleEntity extends Entity {
     private boolean ownerStillLocked(ServerLevel level) {
         if (this.ownerId == null) return false;
         ServerPlayer owner = level.getServer().getPlayerList().getPlayer(this.ownerId);
-        if (owner == null) return false;
+        if (owner == null) return true; // owner offline: can't tell, keep it until they're back
         for (ItemStack stack : owner.getInventory().items) {
             if (TyphonGreatbowItem.isLockCircle(stack, this.getUUID())) return true;
         }
@@ -102,21 +111,25 @@ public class TyphonLockCircleEntity extends Entity {
         return false;
     }
 
-    // Never written to the world save -- a reload simply drops the visual.
-    @Override
-    public boolean shouldBeSaved() {
-        return false;
-    }
-
     @Override
     protected void defineSynchedData() {
     }
 
+    private static final String TARGET_TAG = "Target";
+    private static final String OWNER_TAG = "Owner";
+    private static final String FALL_SPEED_TAG = "FallSpeed";
+
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
+        this.targetId = tag.hasUUID(TARGET_TAG) ? tag.getUUID(TARGET_TAG) : null;
+        this.ownerId = tag.hasUUID(OWNER_TAG) ? tag.getUUID(OWNER_TAG) : null;
+        this.fallSpeed = tag.getDouble(FALL_SPEED_TAG);
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
+        if (this.targetId != null) tag.putUUID(TARGET_TAG, this.targetId);
+        if (this.ownerId != null) tag.putUUID(OWNER_TAG, this.ownerId);
+        tag.putDouble(FALL_SPEED_TAG, this.fallSpeed);
     }
 }

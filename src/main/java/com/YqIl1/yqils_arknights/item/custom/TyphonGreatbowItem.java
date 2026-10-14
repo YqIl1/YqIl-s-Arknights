@@ -6,6 +6,17 @@ import com.YqIl1.yqils_arknights.util.TimedActivation;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.stats.Stats;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -85,16 +96,30 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
     private static final int SKILL_DURATION_TICKS = 0;
 
     private static final double SCAN_RADIUS = 10.0;
+    // Every creature from Gathering Torches Become Sunlight can be locked, even if it doesn't count as a vanilla
+    // "Enemy". Matched by registry namespace, so there's no compile dependency and nothing breaks without it.
+    private static final String TORCHES_BECOME_SUNLIGHT_MODID = "torchesbecomesunlight";
     private static final double SPLASH_RADIUS = 4.0; // must match the lock circle ring (TyphonLockCircleRenderer)
     private static final int LOCKED_SHOTS = 10;
     // Full draw takes 1.5 s while a lock is active (vanilla bows: 20 ticks = 1 s).
     private static final float NORMAL_DRAW_TICKS = 20.0F;
     private static final float LOCKED_DRAW_TICKS = 30.0F;
     private static final int ARROWS_PER_SHOT = 5;
-    private static final double DROP_HEIGHT = 3.0; // blocks above the victim's feet
+    private static final double DROP_HEIGHT = 6.0;    // blocks above the circle centre when there's no one to aim at
+    private static final double HEAD_CLEARANCE = 2.0; // arrows appear this far above the victim's head
+    private static final int CIRCLE_CHECK_INTERVAL = 20; // ticks between "is my lock circle still there?" checks
     private static final double DROP_JITTER = 0.25; // small horizontal spread so stacked arrows don't overlap visually
     private static final int LOCK_GLOW_TICKS = 200; // 10s outline on the locked target
     private static final double ATTACK_DAMAGE_BONUS = 7.0D;
+
+    // --- skill particles ---
+    // Purple dust burst at each skill arrow's spawn point (same lilac as the lock circle).
+    private static final net.minecraft.core.particles.DustParticleOptions SPAWN_BURST =
+            new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.70F, 0.48F, 0.88F), 1.0F);
+    private static final int STARS_PER_TICK = 2;
+    private static final double STAR_FORWARD = 1.1D; // blocks in front of the eyes
+    private static final double STAR_SPREAD = 0.3D;
+    private static final double STAR_SIDE = 0.2D; // shifted toward the hand holding the bow
 
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
@@ -227,12 +252,39 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
         return this.geoCache;
     }
 
+    // While drawing during the skill (a lock is active), purple stars gather in front of the bow.
+    // Client-side only; runs for every player the client can see drawing, so others see it too.
+    @Override
+    public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int remainingUseDuration) {
+        super.onUseTick(level, entity, stack, remainingUseDuration);
+        if (!level.isClientSide || !hasLock(stack)) return;
+        net.minecraft.world.phys.Vec3 look = entity.getLookAngle();
+        // Horizontal "right" of where the entity faces; flipped when the bow is in the left hand.
+        double yaw = Math.toRadians(entity.getYRot());
+        net.minecraft.world.entity.HumanoidArm arm = entity.getUsedItemHand() == InteractionHand.MAIN_HAND
+                ? entity.getMainArm() : entity.getMainArm().getOpposite();
+        double side = arm == net.minecraft.world.entity.HumanoidArm.RIGHT ? STAR_SIDE : -STAR_SIDE;
+        net.minecraft.world.phys.Vec3 front = entity.getEyePosition().add(look.scale(STAR_FORWARD))
+                .add(-Math.cos(yaw) * side, -0.15D, -Math.sin(yaw) * side);
+        for (int i = 0; i < STARS_PER_TICK; i++) {
+            double ox = (level.random.nextDouble() * 2 - 1) * STAR_SPREAD;
+            double oy = (level.random.nextDouble() * 2 - 1) * STAR_SPREAD;
+            double oz = (level.random.nextDouble() * 2 - 1) * STAR_SPREAD;
+            level.addParticle(com.YqIl1.yqils_arknights.particle.ModParticles.TYPHON_STAR.get(),
+                    front.x + ox, front.y + oy, front.z + oz,
+                    -ox * 0.05D, -oy * 0.05D + 0.005D, -oz * 0.05D);
+        }
+    }
+
     // Gives each bow its own GeckoLib id, so two bows being drawn at once don't share one animation.
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
         if (level instanceof ServerLevel serverLevel) {
             GeoItem.getOrAssignId(stack, serverLevel);
+            if (entity instanceof Player player && hasLock(stack) && entity.tickCount % CIRCLE_CHECK_INTERVAL == 0) {
+                ensureLockCircle(stack, serverLevel, player);
+            }
         }
     }
 
@@ -258,24 +310,36 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (player.isShiftKeyDown()) {
-            // Only the manual shift-click cancels -- PRTS goes through activateSkill, which just refuses while locked.
-            if (level instanceof ServerLevel serverLevel && hasLock(stack)) {
-                cancelSkill(stack, serverLevel);
-                return InteractionResultHolder.success(stack);
+        InteractionResultHolder<ItemStack> result;
+        boolean hasInfinity = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+        if (hasInfinity && player.getProjectile(stack).isEmpty()) {
+            // Vanilla bows refuse to draw with zero arrows even with Infinity. This bow allows it (normal and skill
+            // shots both fire a plain arrow then; releaseUsing already handles the no-ammo + Infinity case).
+            InteractionResultHolder<ItemStack> nock = ForgeEventFactory.onArrowNock(stack, level, player, hand, true);
+            if (nock != null) {
+                return nock;
             }
-            if (!level.isClientSide && !activateSkill(stack, level, player)) {
-                return InteractionResultHolder.fail(stack);
-            }
-            return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+            player.startUsingItem(hand);
+            result = InteractionResultHolder.consume(stack);
+        } else {
+            result = super.use(level, player, hand);
         }
-        InteractionResultHolder<ItemStack> result = super.use(level, player, hand);
         // Skill draw sound: only while a lock is active, once per draw (when the pull actually starts).
         if (!level.isClientSide && hasLock(stack) && player.isUsingItem()) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     ModSound.TYPHON_GREATBOW_POWER_DRAW.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
         return result;
+    }
+
+    // Shift + left click (sent from the client via TyphonSkillPacket): cancels an active lock, otherwise tries to
+    // start the skill. Only this manual toggle cancels -- PRTS goes through activateSkill, which refuses while locked.
+    public void toggleSkill(ItemStack stack, ServerLevel level, Player player) {
+        if (hasLock(stack)) {
+            cancelSkill(stack, level);
+        } else {
+            activateSkill(stack, level, player);
+        }
     }
 
     // Overrides the shared self-buff default (same idea as TexasBladeItem), so PRTS triggers the lock-on.
@@ -289,7 +353,7 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
 
         LivingEntity target = level.getEntitiesOfClass(LivingEntity.class,
                         player.getBoundingBox().inflate(SCAN_RADIUS),
-                        e -> e instanceof Enemy && e.isAlive())
+                        e -> e.isAlive() && isLockable(e))
                 .stream()
                 .max(Comparator.comparingDouble(LivingEntity::getHealth))
                 .orElse(null);
@@ -323,13 +387,24 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
             return;
         }
 
-        float power = drawPower(this.getUseDuration(stack) - timeLeft, LOCKED_DRAW_TICKS);
+        // Ammo / Infinity / enchantments follow vanilla BowItem.releaseUsing, so the skill shot behaves like a
+        // normal bow shot apart from where the arrows come from.
+        boolean creative = player.getAbilities().instabuild;
+        boolean hasInfinity = creative || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+        ItemStack ammo = player.getProjectile(stack);
+        int drawTicks = ForgeEventFactory.onArrowLoose(stack, level, player, this.getUseDuration(stack) - timeLeft, !ammo.isEmpty() || hasInfinity);
+        if (drawTicks < 0) return;
+        if (ammo.isEmpty() && !hasInfinity) return;
+        if (ammo.isEmpty()) ammo = new ItemStack(Items.ARROW);
+
+        float power = drawPower(drawTicks, LOCKED_DRAW_TICKS);
         if (power < 0.1F) return; // same "barely drawn" cutoff as vanilla
 
-        boolean creative = player.getAbilities().instabuild;
-        ItemStack ammo = player.getProjectile(stack);
-        if (ammo.isEmpty() && !creative) return;
-        if (ammo.isEmpty()) ammo = new ItemStack(Items.ARROW);
+        // Infinity only covers plain arrows (ArrowItem.isInfinite), exactly like vanilla.
+        boolean infiniteAmmo = creative || (ammo.getItem() instanceof ArrowItem ai && ai.isInfinite(ammo, stack, player));
+        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+        boolean flame = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0;
 
         if (level instanceof ServerLevel serverLevel) {
             Vec3 center = resolveLockCenter(stack, serverLevel);
@@ -347,21 +422,34 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
             float bonusDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * SKILL_ARROW_ATTACK_RATIO;
 
             for (int n = 0; n < ARROWS_PER_SHOT; n++) {
-                // Each arrow picks its own random enemy in the area; if none are left, drop on the spot itself.
-                Vec3 dropAt = area.isEmpty() ? center : area.get(serverLevel.random.nextInt(area.size())).position();
+                // Each arrow picks its own random target in the area; if none are left, drop on the spot itself.
+                LivingEntity victim = area.isEmpty() ? null : area.get(serverLevel.random.nextInt(area.size()));
+                Vec3 dropAt = victim == null ? center : victim.position();
                 double jx = (serverLevel.random.nextDouble() * 2 - 1) * DROP_JITTER;
                 double jz = (serverLevel.random.nextDouble() * 2 - 1) * DROP_JITTER;
+                // Start from the top of the victim's head (or just above the circle) and go up HEAD_CLEARANCE
+                // (or DROP_HEIGHT), stopping below any ceiling so the arrow never spawns inside a block.
+                double baseY = victim == null ? dropAt.y + 0.1D : victim.getY() + victim.getBbHeight();
+                double rise = victim == null ? DROP_HEIGHT : HEAD_CLEARANCE;
+                double spawnY = clearSpawnY(serverLevel, dropAt.x + jx, baseY, dropAt.z + jz, rise);
 
                 AbstractArrow arrow = arrowItem.createArrow(serverLevel, ammo, player);
-                arrow.setPos(dropAt.x + jx, dropAt.y + DROP_HEIGHT, dropAt.z + jz);
+                arrow.setPos(dropAt.x + jx, spawnY, dropAt.z + jz);
                 // Same speed vanilla uses (power * 3), so damage matches a normal shot (damage = speed * baseDamage).
                 arrow.shoot(0.0D, -1.0D, 0.0D, power * 3.0F, 0.0F);
                 if (power == 1.0F) arrow.setCritArrow(true);
-                // Only one arrow is actually consumed per shot, so only the first can be picked back up.
-                if (creative || n > 0) arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+                if (powerLevel > 0) arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5D + 0.5D);
+                if (punchLevel > 0) arrow.setKnockback(punchLevel);
+                if (flame) arrow.setSecondsOnFire(100);
+                // Skill arrows vanish when they hit a block (ModEventHandlers.onProjectileImpact), so none can
+                // actually be picked up; this only matters if that rule is ever removed.
+                if (infiniteAmmo || n > 0) arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                 arrow.getPersistentData().putBoolean(SKILL_ARROW_TAG, true);
                 arrow.getPersistentData().putFloat(SKILL_ARROW_BONUS_KEY, bonusDamage);
                 serverLevel.addFreshEntity(arrow);
+                // Purple burst where each skill arrow appears.
+                serverLevel.sendParticles(SPAWN_BURST, arrow.getX(), arrow.getY(), arrow.getZ(),
+                        8, 0.2D, 0.15D, 0.2D, 0.0D);
             }
 
             stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
@@ -371,7 +459,13 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
                     SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
         }
 
-        if (!creative) ammo.shrink(1);
+        if (!infiniteAmmo) {
+            ammo.shrink(1);
+            if (ammo.isEmpty()) {
+                player.getInventory().removeItem(ammo);
+            }
+        }
+        player.awardStat(Stats.ITEM_USED.get(this));
     }
 
     // Same curve as vanilla BowItem.getPowerForTime, just stretched to drawTicksForFull ticks.
@@ -382,6 +476,51 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
 
     private static float fullDrawTicks(ItemStack stack) {
         return hasLock(stack) ? LOCKED_DRAW_TICKS : NORMAL_DRAW_TICKS;
+    }
+
+    // Highest Y up to baseY + rise with a clear line from baseY. If a ceiling is in the way, spawn half a block
+    // under it (an arrow's hitbox is 0.5); never lower than just above baseY.
+    private static double clearSpawnY(ServerLevel level, double x, double baseY, double z, double rise) {
+        Vec3 from = new Vec3(x, baseY, z);
+        Vec3 to = new Vec3(x, baseY + rise, z);
+        BlockHitResult hit = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+        if (hit.getType() == HitResult.Type.MISS) {
+            return to.y;
+        }
+        return Math.max(baseY + 0.1D, hit.getLocation().y - 0.5D);
+    }
+
+    // While a lock is active, make sure its circle exists (it can be missing after the bow was dropped and picked
+    // back up, or for a lock started before circles were saved). Only respawns where the chunk is loaded, so a
+    // circle that is merely in an unloaded chunk isn't duplicated.
+    private static void ensureLockCircle(ItemStack stack, ServerLevel level, Player player) {
+        CompoundTag tag = stack.getOrCreateTag();
+        if (tag.hasUUID(LOCK_CIRCLE_KEY) && level.getEntity(tag.getUUID(LOCK_CIRCLE_KEY)) instanceof TyphonLockCircleEntity) {
+            return;
+        }
+        UUID targetId = tag.hasUUID(LOCK_TARGET_KEY) ? tag.getUUID(LOCK_TARGET_KEY) : null;
+        Vec3 pos = targetId != null && level.getEntity(targetId) instanceof LivingEntity target && target.isAlive()
+                ? target.position()
+                : new Vec3(tag.getDouble(LOCK_X_KEY), tag.getDouble(LOCK_Y_KEY), tag.getDouble(LOCK_Z_KEY));
+        if (!level.isLoaded(BlockPos.containing(pos))) {
+            return;
+        }
+        TyphonLockCircleEntity circle = new TyphonLockCircleEntity(level, targetId, pos, player);
+        level.addFreshEntity(circle);
+        tag.putUUID(LOCK_CIRCLE_KEY, circle.getUUID());
+    }
+
+    // Lock-on candidates: vanilla hostiles (Enemy) plus every creature from Torches Become Sunlight, except anything
+    // with an owner (that mod's partners and any tamed pet), so the skill never locks onto an ally.
+    private static boolean isLockable(LivingEntity e) {
+        if (e instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null) {
+            return false;
+        }
+        if (e instanceof Enemy) {
+            return true;
+        }
+        ResourceLocation id = ForgeRegistries.ENTITY_TYPES.getKey(e.getType());
+        return id != null && TORCHES_BECOME_SUNLIGHT_MODID.equals(id.getNamespace());
     }
 
     private static double horizontalDistanceSqr(Vec3 a, Vec3 b) {

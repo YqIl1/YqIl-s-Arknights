@@ -52,6 +52,10 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> STUN = MOB_EFFECTS.register("stun",
             () -> new StunEffect(MobEffectCategory.HARMFUL, 0x888888));
 
+    // "很重的枪" -- granted by Ceobe's Spear's right-click skill (60s). Behaviour TBD.
+    public static final RegistryObject<MobEffect> CEOBE_POWER = MOB_EFFECTS.register("ceobe_power",
+            () -> new com.YqIl1.yqils_arknights.effect.custom.CeobePowerEffect(MobEffectCategory.BENEFICIAL, 0xE0893A));
+
     // Applied by Lappland's Blade (The Young Fang). Behaviour lives in ModEventHandlers.
     public static final RegistryObject<MobEffect> SILENCE = MOB_EFFECTS.register("silence",
             () -> new com.YqIl1.yqils_arknights.effect.custom.SilenceEffect(MobEffectCategory.HARMFUL, 0xA0A5AD));

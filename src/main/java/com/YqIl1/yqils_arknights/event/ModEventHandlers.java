@@ -17,6 +17,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.living.*;
@@ -154,6 +155,10 @@ public class ModEventHandlers {
         }
         if (event.getRayTraceResult() instanceof EntityHitResult hit && hit.getEntity() instanceof LivingEntity target) {
             target.invulnerableTime = 0;
+        } else if (event.getRayTraceResult().getType() == HitResult.Type.BLOCK) {
+            // Skill arrows vanish the moment they hit a block instead of sticking in the ground, so the
+            // rain never leaves a pile of arrows behind. (Arrows that hit a creature are removed by vanilla.)
+            event.setImpactResult(ProjectileImpactEvent.ImpactResult.STOP_AT_CURRENT_NO_DAMAGE);
         }
     }
 
@@ -280,6 +285,16 @@ public class ModEventHandlers {
     public static void onStunnedConversion(LivingConversionEvent.Post event) {
         if (event.getEntity().hasEffect(ModEffects.STUN.get()) && event.getOutcome() instanceof Mob outcome) {
             outcome.setNoAi(false);
+        }
+    }
+
+    // Ceobe's Spear: auto-throw at full charge and restart the charge (see CeobeSpearItem#tickThrowCharge).
+    // Using the event's duration (rather than stop/startUsingItem) resets the hold cleanly on both sides.
+    @SubscribeEvent
+    public static void onCeobeSpearChargeTick(LivingEntityUseItemEvent.Tick event) {
+        if (event.getItem().getItem() instanceof com.YqIl1.yqils_arknights.item.custom.CeobeSpearItem spear
+                && event.getEntity() instanceof Player player) {
+            event.setDuration(spear.tickThrowCharge(event.getItem(), player, event.getDuration()));
         }
     }
 }

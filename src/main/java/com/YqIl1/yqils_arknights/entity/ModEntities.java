@@ -41,9 +41,16 @@ public class ModEntities {
     public static final RegistryObject<EntityType<TyphonLockCircleEntity>> TYPHON_LOCK_CIRCLE = ENTITY_TYPES.register("typhon_lock_circle",
             () -> EntityType.Builder.<TyphonLockCircleEntity>of(TyphonLockCircleEntity::new, MobCategory.MISC)
                     .sized(9.0F, 0.1F)
-                    .noSave()
                     .fireImmune()
                     .clientTrackingRange(8)
                     .updateInterval(1)
                     .build("typhon_lock_circle"));
+
+    // Thrown Ceobe's Spear (only throwable while "Really Heavy Spear" is active). Same size/tracking as the trident.
+    public static final RegistryObject<EntityType<com.YqIl1.yqils_arknights.entity.custom.ThrownCeobeSpear>> THROWN_CEOBE_SPEAR = ENTITY_TYPES.register("thrown_ceobe_spear",
+            () -> EntityType.Builder.<com.YqIl1.yqils_arknights.entity.custom.ThrownCeobeSpear>of(com.YqIl1.yqils_arknights.entity.custom.ThrownCeobeSpear::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(4)
+                    .updateInterval(20)
+                    .build("thrown_ceobe_spear"));
 }

@@ -125,5 +125,33 @@
         "name": "yqils_arknights:typhon_greatbow_power_hit"
       }
     ]
+  },
+  "texas_blade_melee": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:texas_blade_melee"
+      }
+    ]
+  },
+  "texas_blade_power": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:texas_blade_power"
+      }
+    ]
+  },
+  "ceobe_spear_power_charge": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:ceobe_spear_power_charge"
+      }
+    ]
+  },
+  "ceobe_spear_power_hit": {
+    "sounds": [
+      {
+        "name": "yqils_arknights:ceobe_spear_power_hit"
+      }
+    ]
   }
 }

@@ -32,7 +32,11 @@ public record ItemEffectDisplay(ItemStack item, MobEffect effect, int durationTi
                 new ItemEffectDisplay(new ItemStack(ModItems.NCDEER_FAN.get()), ModEffects.NC_DEER_FAN_POWER.get(), 400, Relation.GAIN),
                 new ItemEffectDisplay(new ItemStack(ModItems.IFRIT_FLAMETHROWER.get()), ModEffects.IMMOLATION.get(), IfritFlamethrowerItem.IMMOLATION_DURATION_TICKS, Relation.APPLY),
                 new ItemEffectDisplay(new ItemStack(ModItems.NEARL_SHIELD.get()), ModEffects.NEARL_SHIELD_POWER.get(), 800, Relation.GAIN),
-                new ItemEffectDisplay(new ItemStack(ModItems.TEXAS_BLADE.get()), ModEffects.STUN.get(), 60, Relation.APPLY)
+                new ItemEffectDisplay(new ItemStack(ModItems.TEXAS_BLADE.get()), ModEffects.STUN.get(), 60, Relation.APPLY),
+                new ItemEffectDisplay(new ItemStack(ModItems.CEOBE_SPEAR.get()), ModEffects.CEOBE_POWER.get(),
+                        com.YqIl1.yqils_arknights.item.custom.CeobeSpearItem.SKILL_DURATION_TICKS, Relation.GAIN),
+                new ItemEffectDisplay(new ItemStack(ModItems.CEOBE_SPEAR.get()), ModEffects.SILENCE.get(),
+                        com.YqIl1.yqils_arknights.item.custom.CeobeSpearItem.SILENCE_DURATION_TICKS, Relation.APPLY)
         );
     }
 }
