@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 // Ceobe's Spear. Stats copied from the vanilla trident (250 durability, 9 attack damage, 1.1 attack speed,
-// 1 durability per hit, 2 per block broken). Right click: grants "很重的枪" / Really Heavy Spear (ceobe_power)
+// 1 durability per hit, 2 per block broken). Right click: grants "很重的枪" / Really Heavy Spear (ceobe_spear_power)
 // for 60 s, then an 80 s cooldown that starts once the effect ends (TimedActivation, same as the other skill
 // items). While the effect is active: ATK +210% (the effect's modifier), every hit silences for 5 s, and
 // right click instead charges a trident-style throw (ThrownCeobeSpear).
@@ -93,7 +93,7 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        if (attacker.hasEffect(ModEffects.CEOBE_POWER.get())) {
+        if (attacker.hasEffect(ModEffects.CEOBE_SPEAR_POWER.get())) {
             target.addEffect(new MobEffectInstance(ModEffects.SILENCE.get(), SILENCE_DURATION_TICKS, 0));
             target.level().playSound(null, target.getX(), target.getY(), target.getZ(),
                     ModSound.CEOBE_SPEAR_POWER_HIT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -115,6 +115,18 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
         return 1;
     }
 
+    // Not a SwordItem/TridentItem, so by default only the generic "breakable" enchantments (Unbreaking,
+    // Mending) fit. Also accept the sword ones -- except Sweeping Edge, a spear doesn't sweep -- plus
+    // Impaling, which applies to both melee hits and the thrown spear (getDamageBonus).
+    // Enchantment#canEnchant routes through here too, so this covers anvils/books as well as the table.
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.world.item.enchantment.Enchantment enchantment) {
+        if (enchantment == net.minecraft.world.item.enchantment.Enchantments.SWEEPING_EDGE) return false;
+        return enchantment.category == net.minecraft.world.item.enchantment.EnchantmentCategory.WEAPON
+                || enchantment == net.minecraft.world.item.enchantment.Enchantments.IMPALING
+                || super.canApplyAtEnchantingTable(stack, enchantment);
+    }
+
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return slotChanged || oldStack.getItem() != newStack.getItem();
@@ -132,7 +144,7 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (player.hasEffect(ModEffects.CEOBE_POWER.get())) {
+        if (player.hasEffect(ModEffects.CEOBE_SPEAR_POWER.get())) {
             if (stack.getDamageValue() >= stack.getMaxDamage() - 1) {
                 return InteractionResultHolder.fail(stack); // same as the trident: don't throw a breaking spear
             }
@@ -165,13 +177,13 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
         int elapsed = this.getUseDuration(stack) - remaining;
         Level level = player.level();
         if (elapsed < 0) return remaining; // pause after a throw -- nothing charges yet
-        if (elapsed == 0 && !level.isClientSide && player.hasEffect(ModEffects.CEOBE_POWER.get())) {
+        if (elapsed == 0 && !level.isClientSide && player.hasEffect(ModEffects.CEOBE_SPEAR_POWER.get())) {
             // A charge is starting (first press, or the pause after a throw just ended).
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     ModSound.CEOBE_SPEAR_POWER_CHARGE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
         if (elapsed < MIN_THROW_CHARGE_TICKS) return remaining;
-        if (!player.hasEffect(ModEffects.CEOBE_POWER.get())) return remaining; // skill ended mid-hold: just hold
+        if (!player.hasEffect(ModEffects.CEOBE_SPEAR_POWER.get())) return remaining; // skill ended mid-hold: just hold
         if (stack.getDamageValue() >= stack.getMaxDamage() - 1) return remaining; // don't break the spear
 
         if (!level.isClientSide) {
@@ -197,7 +209,7 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
 
     @Override
     public RegistryObject<MobEffect> getSkillEffect() {
-        return ModEffects.CEOBE_POWER;
+        return ModEffects.CEOBE_SPEAR_POWER;
     }
 
     @Override

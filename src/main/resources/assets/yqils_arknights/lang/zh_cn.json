@@ -99,7 +99,7 @@
   "effect.yqils_arknights.silence.description": "失去特殊能力和增益效果",
   "item.yqils_arknights.ceobe_spear": "很重的枪",
   "item.yqils_arknights.ceobe_spear.description": "右键获得“很重的枪”，持续60秒，冷却80秒",
-  "effect.yqils_arknights.ceobe_power": "“很重的枪”",
-  "effect.yqils_arknights.ceobe_power.description": "攻击力+210%，攻击使目标沉默5秒，长枪可以投掷",
+  "effect.yqils_arknights.ceobe_spear_power": "“很重的枪”",
+  "effect.yqils_arknights.ceobe_spear_power.description": "攻击力+210%，攻击使目标沉默5秒，长枪可以投掷",
   "entity.yqils_arknights.thrown_ceobe_spear": "很重的枪"
 }

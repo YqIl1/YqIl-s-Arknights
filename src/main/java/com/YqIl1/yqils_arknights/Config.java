@@ -1,6 +1,10 @@
 package com.YqIl1.yqils_arknights;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,12 +32,36 @@ public class Config {
     // a list of strings that are treated as resource locations for items
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER.comment("A list of items to log on common setup.").defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
 
+    // Silence: entities listed here are treated like bosses (forge:bosses) -- they keep their ranged/special
+    // attacks, explosions and summons while silenced. Entries are entity ids ("modid:entity") or entity type
+    // tags prefixed with '#' ("#modid:tag"). Ids of mods that aren't installed are simply ignored.
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SILENCE_BOSS_LIKE = BUILDER
+            .comment("Entities treated like bosses by Silence (keep ranged/special attacks, explosions and summons).",
+                    "Entity ids like \"minecraft:warden\", or entity type tags like \"#modid:some_tag\".")
+            .defineListAllowEmpty("silenceBossLikeEntities", List.of(), Config::validateEntityEntry);
+
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean logDirtBlock;
     public static int magicNumber;
     public static String magicNumberIntroduction;
     public static Set<Item> items;
+    public static Set<ResourceLocation> silenceBossLikeIds = Collections.emptySet();
+    public static Set<TagKey<EntityType<?>>> silenceBossLikeTags = Collections.emptySet();
+
+    // True if this entity is listed in silenceBossLikeEntities (by id or by tag).
+    public static boolean isSilenceBossLike(Entity entity) {
+        if (silenceBossLikeIds.contains(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()))) return true;
+        for (TagKey<EntityType<?>> tag : silenceBossLikeTags) {
+            if (entity.getType().is(tag)) return true;
+        }
+        return false;
+    }
+
+    private static boolean validateEntityEntry(final Object obj) {
+        if (!(obj instanceof final String entry)) return false;
+        return ResourceLocation.isValidResourceLocation(entry.startsWith("#") ? entry.substring(1) : entry);
+    }
 
     private static boolean validateItemName(final Object obj) {
         return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(new ResourceLocation(itemName));
@@ -47,5 +75,11 @@ public class Config {
 
         // convert the list of strings into a set of items
         items = ITEM_STRINGS.get().stream().map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName))).collect(Collectors.toSet());
+
+        silenceBossLikeIds = SILENCE_BOSS_LIKE.get().stream().filter(e -> !e.startsWith("#"))
+                .map(ResourceLocation::new).collect(Collectors.toSet());
+        silenceBossLikeTags = SILENCE_BOSS_LIKE.get().stream().filter(e -> e.startsWith("#"))
+                .map(e -> TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(e.substring(1))))
+                .collect(Collectors.toSet());
     }
 }

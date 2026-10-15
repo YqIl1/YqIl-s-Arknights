@@ -30,10 +30,15 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.projectile.EvokerFangs;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.entity.EntityMobGriefingEvent;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
@@ -168,6 +173,19 @@ public class ModEventHandlers {
         return entity instanceof LivingEntity living && living.hasEffect(ModEffects.SILENCE.get());
     }
 
+    // Bosses (forge:bosses tag -- Wither, Ender Dragon, and any mod boss that adds itself) keep their ranged
+    // attacks while silenced: the projectile / non-melee damage / explosion rules below skip them. Everything
+    // else (buff stripping, no new buffs, no teleport...) still applies.
+    // Also anything listed in the config's silenceBossLikeEntities.
+    private static boolean isBoss(@Nullable Entity entity) {
+        return entity != null && (entity.getType().is(net.minecraftforge.common.Tags.EntityTypes.BOSSES)
+                || com.YqIl1.yqils_arknights.Config.isSilenceBossLike(entity));
+    }
+
+    private static boolean isSilencedNonBoss(@Nullable Entity entity) {
+        return isSilenced(entity) && !isBoss(entity);
+    }
+
     // Strip beneficial effects every tick, and keep creepers from fusing. Done here (start of
     // LivingEntity.tick, before tickEffects iterates the effect map) instead of in the effect's own tick.
     @SubscribeEvent
@@ -199,17 +217,22 @@ public class ModEventHandlers {
         }
     }
 
-    // A silenced attacker can only deal its own plain melee damage. Everything else it causes (projectiles
-    // already in flight, guardian laser, warden sonic boom, fangs, explosions, magic...) is cancelled.
+    // A silenced attacker can only deal its own plain melee damage and normal projectile hits (arrows,
+    // fireballs, tridents...). Everything else it causes (guardian laser, warden sonic boom, fangs,
+    // explosions, magic...) is cancelled. Harmful on-hit effects from either are still blocked below.
     @SubscribeEvent
     public static void onSilencedAttack(LivingAttackEvent event) {
         DamageSource source = event.getSource();
         if (!(source.getEntity() instanceof LivingEntity attacker) || !attacker.hasEffect(ModEffects.SILENCE.get())) {
             return;
         }
+        if (isBoss(attacker)) {
+            return; // bosses keep their ranged / special damage
+        }
         boolean plainMelee = source.getDirectEntity() == attacker
                 && (source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO) || source.is(DamageTypes.PLAYER_ATTACK));
-        if (!plainMelee) {
+        boolean projectileHit = source.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile;
+        if (!plainMelee && !projectileHit) {
             event.setCanceled(true);
             return;
         }
@@ -217,7 +240,8 @@ public class ModEventHandlers {
         target.getPersistentData().putLong(SILENCED_HIT_TICK_KEY, target.level().getGameTime());
     }
 
-    // Silenced creatures can't create projectiles, evoker fangs, vexes or lingering effect clouds.
+    // Silenced creatures can't create evoker fangs, vexes or lingering effect clouds. (Projectiles are
+    // allowed, and hit normally -- see onSilencedAttack.)
     @SubscribeEvent
     public static void onSilencedSpawn(EntityJoinLevelEvent event) {
         if (event.getLevel().isClientSide()) {
@@ -245,12 +269,30 @@ public class ModEventHandlers {
         }
 
         Entity owner = null;
-        if (spawned instanceof Projectile projectile) owner = projectile.getOwner();
-        else if (spawned instanceof EvokerFangs fangs) owner = fangs.getOwner();
+        if (spawned instanceof EvokerFangs fangs) owner = fangs.getOwner();
         else if (spawned instanceof Vex vex) owner = vex.getOwner();
         else if (spawned instanceof AreaEffectCloud cloud) owner = cloud.getOwner();
-        if (isSilenced(owner)) {
+        if (isSilencedNonBoss(owner)) {
             event.setCanceled(true);
+        }
+    }
+
+    // Compat: whenever our Silence lands, also apply Caerula Arbor's own silence (caerula_arbor:mute) with the
+    // same duration/level, so that mod's creatures and abilities respect it too. Looked up by registry name,
+    // so there's no compile dependency and nothing happens when Caerula Arbor isn't installed.
+    private static final net.minecraft.resources.ResourceLocation CAERULA_ARBOR_MUTE =
+            new net.minecraft.resources.ResourceLocation("caerula_arbor", "mute");
+
+    @SubscribeEvent
+    public static void onSilenceAdded(MobEffectEvent.Added event) {
+        MobEffectInstance added = event.getEffectInstance();
+        LivingEntity entity = event.getEntity();
+        if (added.getEffect() != ModEffects.SILENCE.get() || entity.level().isClientSide) {
+            return;
+        }
+        MobEffect mute = net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getValue(CAERULA_ARBOR_MUTE);
+        if (mute != null) {
+            entity.addEffect(new MobEffectInstance(mute, added.getDuration(), added.getAmplifier()), event.getEffectSource());
         }
     }
 
@@ -273,7 +315,7 @@ public class ModEventHandlers {
     // Safety net: no explosions caused by a silenced creature.
     @SubscribeEvent
     public static void onSilencedExplosion(ExplosionEvent.Start event) {
-        if (isSilenced(event.getExplosion().getIndirectSourceEntity()) || isSilenced(event.getExplosion().getExploder())) {
+        if (isSilencedNonBoss(event.getExplosion().getIndirectSourceEntity()) || isSilencedNonBoss(event.getExplosion().getExploder())) {
             event.setCanceled(true);
         }
     }
@@ -295,6 +337,54 @@ public class ModEventHandlers {
         if (event.getItem().getItem() instanceof com.YqIl1.yqils_arknights.item.custom.CeobeSpearItem spear
                 && event.getEntity() instanceof Player player) {
             event.setDuration(spear.tickThrowCharge(event.getItem(), player, event.getDuration()));
+        }
+    }
+
+    //Silenced death: block delayed death effects
+    private static final double DEATH_EXPLOSION_RADIUS = 2.0D; // explosions centred this close to the corpse
+
+    private static boolean isDyingSilenced(@Nullable Entity entity) {
+        return entity instanceof LivingEntity living && living.isDeadOrDying() && isSilencedNonBoss(living);
+    }
+
+    // Any dying silenced creature within `radius` of `pos` in this level.
+    private static boolean dyingSilencedNear(Level level, Vec3 pos, double radius) {
+        AABB box = new AABB(pos, pos).inflate(radius);
+        return !level.getEntitiesOfClass(LivingEntity.class, box, ModEventHandlers::isDyingSilenced).isEmpty();
+    }
+
+    // Explosions caused by the corpse, or centred right on it (some mods explode with no source).
+    @SubscribeEvent
+    public static void onSilencedDeathExplosion(ExplosionEvent.Start event) {
+        Explosion explosion = event.getExplosion();
+        if (isDyingSilenced(explosion.getIndirectSourceEntity()) || isDyingSilenced(explosion.getExploder())
+                || dyingSilencedNear(event.getLevel(), explosion.getPosition(), DEATH_EXPLOSION_RADIUS)) {
+            event.setCanceled(true);
+        }
+    }
+
+    // Any damage dealt by the corpse -- including melee-typed damage, which a *living* silenced mob is
+    // still allowed to deal (see onSilencedAttack).
+    @SubscribeEvent
+    public static void onSilencedDeathDamage(LivingAttackEvent event) {
+        DamageSource source = event.getSource();
+        if (isDyingSilenced(source.getEntity()) || isDyingSilenced(source.getDirectEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    // Block changes the corpse makes through Forge's hooks (placing blocks/fire, mob griefing).
+    @SubscribeEvent
+    public static void onSilencedDeathPlace(BlockEvent.EntityPlaceEvent event) {
+        if (isDyingSilenced(event.getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onSilencedDeathGriefing(EntityMobGriefingEvent event) {
+        if (isDyingSilenced(event.getEntity())) {
+            event.setResult(Event.Result.DENY);
         }
     }
 }

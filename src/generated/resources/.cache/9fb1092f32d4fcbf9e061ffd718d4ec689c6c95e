@@ -1,6 +1,7 @@
-// 1.20.1	2026-10-11T00:28:18.66723	Recipes
+// 1.20.1	2026-10-15T01:25:00.044042	Recipes
 847e715e1cb7890e5542055afc08b7b31e221ca5 data/yqils_arknights/advancements/recipes/misc/gear_base.json
 6ad40861626de92f168fc368f63789b6c801783b data/yqils_arknights/advancements/recipes/misc/weapon_forging_station.json
+da261c1afde898d371277b0145e56be5900b7431 data/yqils_arknights/recipes/ceobe_spear_from_forging.json
 7d8889b5b98d04469e560f0a0e4afdbb50d07394 data/yqils_arknights/recipes/eyjafjala_wand_from_forging.json
 8383a31df4bdab45da50f549a08b923dd26610f1 data/yqils_arknights/recipes/gear_base.json
 4cf315610b1c5ded0013d9524f4f6465a26a7b68 data/yqils_arknights/recipes/ifrift_flamethrower_from_forging.json

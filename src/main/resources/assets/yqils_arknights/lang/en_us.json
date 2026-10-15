@@ -96,7 +96,7 @@
   "effect.yqils_arknights.silence.description": "Loses special abilities and beneficial effects",
   "item.yqils_arknights.ceobe_spear": "Really Heavy Spear",
   "item.yqils_arknights.ceobe_spear.description": "Right click to gain \"Really Heavy Spear\" for 60 seconds, cooldown 80 seconds",
-  "effect.yqils_arknights.ceobe_power": "\"Really Heavy Spear\"",
-  "effect.yqils_arknights.ceobe_power.description": "ATK +210%, attacks silence targets for 5 seconds, the spear can be thrown",
+  "effect.yqils_arknights.ceobe_spear_power": "\"Really Heavy Spear\"",
+  "effect.yqils_arknights.ceobe_spear_power.description": "ATK +210%, attacks silence targets for 5 seconds, the spear can be thrown",
   "entity.yqils_arknights.thrown_ceobe_spear": "Really Heavy Spear"
 }

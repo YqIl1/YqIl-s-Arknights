@@ -28,6 +28,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         //Sword
         this.tag(ItemTags.SWORDS).add(ModItems.LAPPLAND_BLADE.get());
         this.tag(ItemTags.SWORDS).add(ModItems.TEXAS_BLADE.get());
+        this.tag(ItemTags.SWORDS).add(ModItems.CEOBE_SPEAR.get());
 
 
         //Weapons
@@ -50,7 +51,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ModTags.Items.NO_MELEE).add(ModItems.IFRIT_FLAMETHROWER.get());
         this.tag(ModTags.Items.NO_MELEE).add(ModItems.TYPHON_GREATBOW.get());
 
-        //ranged
+        //Ranged
         this.tag(ModTags.Items.RANGED).add(ModItems.TYPHON_GREATBOW.get());
     }
 }
