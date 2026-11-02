@@ -56,7 +56,7 @@ public class NCDeerFanItem extends Item implements CrosshairCounterItem, Activat
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
 
-        if (!TimedActivation.isReady(itemstack, pLevel, NC_DEER_FAN_LAST_USED_KEY, NC_DEER_FAN_DURATION_TICKS, NC_DEER_FAN_COOLDOWN_TICKS)) {
+        if (!isSkillReady(itemstack, pLevel, pPlayer)) {
             return InteractionResultHolder.fail(itemstack);
         }
 
@@ -81,6 +81,11 @@ public class NCDeerFanItem extends Item implements CrosshairCounterItem, Activat
 
     public static int getNCDeerFanElapsedSeconds(ItemStack stack, Level level) {
         return TimedActivation.getElapsedSeconds(stack, level, NC_DEER_FAN_LAST_USED_KEY, NC_DEER_FAN_DURATION_TICKS, NC_DEER_FAN_COOLDOWN_SECONDS);
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level, Player player) {
+        return skillElapsedSeconds(stack, level, player) + "/" + NC_DEER_FAN_COOLDOWN_SECONDS;
     }
 
     @Override

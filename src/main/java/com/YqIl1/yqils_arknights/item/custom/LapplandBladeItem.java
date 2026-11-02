@@ -116,6 +116,7 @@ public class LapplandBladeItem extends SwordItem implements CrosshairCounterItem
 
     private LapplandBladeProjectile fireProjectile(Level level, Player player, float dmg, float xOffset, float yOffset) {
         LapplandBladeProjectile projectile = new LapplandBladeProjectile(level, player);
+        projectile.setWeapon(player.getMainHandItem().getItem() == this ? player.getMainHandItem() : player.getOffhandItem());
         projectile.setDamage(dmg);
         projectile.shootFromRotation(player, player.getXRot()-xOffset, player.getYRot()+yOffset, 0.0F, 1.5F, 1.0F);
         level.addFreshEntity(projectile);

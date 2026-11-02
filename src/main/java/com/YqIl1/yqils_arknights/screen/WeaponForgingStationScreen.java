@@ -20,11 +20,15 @@ import java.util.List;
 public class WeaponForgingStationScreen extends AbstractContainerScreen<WeaponForgingStationMenu> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Yqils_arknights.MODID, "textures/gui/weapon_forging_station_gui.png");
 
-    // Mirrors vanilla StonecutterScreen's geometry exactly, since this GUI texture follows the same layout
+    // Stonecutter-style list, sized to this GUI texture: the recipe box is 64x37 px (4 columns x 2 rows,
+    // vs. the stonecutter's 3 rows) and the scroll track beside it is 12x37 with a 15 px tall knob.
     private static final int SCROLLER_WIDTH = 12;
-    private static final int SCROLLER_FULL_HEIGHT = 54;
+    private static final int SCROLLER_FULL_HEIGHT = 37;
+    private static final int SCROLLER_KNOB_HEIGHT = 15;
+    private static final int SCROLLER_X = 119;
+    private static final int SCROLLER_Y = 15;
     private static final int RECIPES_COLUMNS = 4;
-    private static final int RECIPES_ROWS = 3;
+    private static final int RECIPES_ROWS = 2;
     private static final int RECIPES_IMAGE_SIZE_WIDTH = 16;
     private static final int RECIPES_IMAGE_SIZE_HEIGHT = 18;
     private static final int RECIPES_X = 52;
@@ -76,9 +80,15 @@ public class WeaponForgingStationScreen extends AbstractContainerScreen<WeaponFo
         renderProgressArrow(guiGraphics, i, j);
 
         List<WeaponForgeRecipe> recipes = menu.getRecipes();
+        if (!isScrollBarActive(recipes)) {
+            // List shrank (input changed) -- don't stay scrolled past the end.
+            this.scrollOffs = 0.0F;
+            this.startIndex = 0;
+        }
         if (!recipes.isEmpty()) {
-            int k = (int) (41.0F * this.scrollOffs);
-            guiGraphics.blit(TEXTURE, i + 119, j + 15 + k, 176 + (isScrollBarActive(recipes) ? 0 : 12), 0, 12, 15);
+            int k = (int) ((SCROLLER_FULL_HEIGHT - SCROLLER_KNOB_HEIGHT) * this.scrollOffs);
+            guiGraphics.blit(TEXTURE, i + SCROLLER_X, j + SCROLLER_Y + k, 176 + (isScrollBarActive(recipes) ? 0 : 12), 0,
+                    SCROLLER_WIDTH, SCROLLER_KNOB_HEIGHT);
 
             int l = this.leftPos + RECIPES_X;
             int i1 = this.topPos + RECIPES_Y;
@@ -161,8 +171,8 @@ public class WeaponForgingStationScreen extends AbstractContainerScreen<WeaponFo
                 }
             }
 
-            i = this.leftPos + 119;
-            j = this.topPos + 9;
+            i = this.leftPos + SCROLLER_X;
+            j = this.topPos + SCROLLER_Y;
             if (mouseX >= i && mouseX < i + SCROLLER_WIDTH && mouseY >= j && mouseY < j + SCROLLER_FULL_HEIGHT) {
                 this.scrolling = true;
             }
@@ -175,9 +185,9 @@ public class WeaponForgingStationScreen extends AbstractContainerScreen<WeaponFo
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         List<WeaponForgeRecipe> recipes = menu.getRecipes();
         if (this.scrolling && isScrollBarActive(recipes)) {
-            int i = this.topPos + RECIPES_Y;
+            int i = this.topPos + SCROLLER_Y;
             int j = i + SCROLLER_FULL_HEIGHT;
-            this.scrollOffs = ((float) mouseY - (float) i - 7.5F) / ((float) (j - i) - 15.0F);
+            this.scrollOffs = ((float) mouseY - (float) i - SCROLLER_KNOB_HEIGHT / 2.0F) / ((float) (j - i) - SCROLLER_KNOB_HEIGHT);
             this.scrollOffs = Mth.clamp(this.scrollOffs, 0.0F, 1.0F);
             this.startIndex = (int) ((double) (this.scrollOffs * (float) getOffscreenRows(recipes)) + 0.5D) * RECIPES_COLUMNS;
             return true;

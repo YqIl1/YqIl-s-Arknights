@@ -24,5 +24,10 @@ public final class ModNetwork {
                 .decoder(TyphonSkillPacket::decode)
                 .consumerMainThread(TyphonSkillPacket::handle)
                 .add();
+        CHANNEL.messageBuilder(PrtsCommandPacket.class, nextId++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(PrtsCommandPacket::encode)
+                .decoder(PrtsCommandPacket::decode)
+                .consumerMainThread(PrtsCommandPacket::handle)
+                .add();
     }
 }

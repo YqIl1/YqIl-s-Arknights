@@ -7,8 +7,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 
 // Stun: disables the target's AI (movement, targeting, attacking) for the effect's duration via
-// Mob#setNoAi. Only affects Mob subclasses -- Player has no AI goals to disable, so this effect
-// does nothing to a stunned player beyond whatever else it's combined with.
+// Mob#setNoAi. Players have no AI, so for them it blocks gameplay input instead: client/StunInput
+// (movement, clicks, hotbar, drop, offhand swap) plus server-side refusals in ModEventHandlers.
 public class StunEffect extends MobEffect {
     public StunEffect(MobEffectCategory category, int color) {
         super(category, color);

@@ -75,7 +75,7 @@ public class TexasBladeItem extends SwordItem implements CrosshairCounterItem, A
         if (sound != null) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), sound.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
-        strikeNearbyMobs(level, player);
+        strikeNearbyMobs(level, player, stack);
         // The second wave can't happen synchronously (needs to wait 2 ticks), so queue it via NBT and
         // pick it up in inventoryTick below instead.
         stack.getOrCreateTag().putLong(SWORDRAIN_PENDING_STRIKE_KEY, level.getGameTime() + REPEAT_DELAY_TICKS);
@@ -96,20 +96,24 @@ public class TexasBladeItem extends SwordItem implements CrosshairCounterItem, A
 
         if (level.getGameTime() >= tag.getLong(SWORDRAIN_PENDING_STRIKE_KEY)) {
             tag.remove(SWORDRAIN_PENDING_STRIKE_KEY);
-            strikeNearbyMobs(level, player);
+            strikeNearbyMobs(level, player, stack);
         }
     }
 
-    private static void strikeNearbyMobs(Level level, Player player) {
+    private static void strikeNearbyMobs(Level level, Player player, ItemStack weapon) {
         float damage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * STRIKE_DAMAGE_PERCENT;
         List<LivingEntity> targets = level.getEntitiesOfClass(
                 LivingEntity.class,
                 player.getBoundingBox().inflate(STRIKE_RADIUS),
-                target -> target != player && target.isAlive()
+                // SkillTargeting: never your own creatures; other players and their creatures only when PvP
+                // allows (otherwise vanilla blocks player damage but the stun below would still land).
+                target -> target.isAlive() && com.YqIl1.yqils_arknights.util.SkillTargeting.canSkillHit(player, target)
         );
 
         for (LivingEntity target : targets) {
-            target.hurt(player.damageSources().indirectMagic(player, player), damage);
+            // Magic damage (ignores armor) with a "pierced by Sword Rain" death message -- see WeaponMagicDamageSource.
+            target.hurt(com.YqIl1.yqils_arknights.damage.WeaponMagicDamageSource.magic(player, weapon)
+                    .withMessage(com.YqIl1.yqils_arknights.damage.WeaponMagicDamageSource.SWORD_RAIN), damage);
             target.addEffect(new MobEffectInstance(ModEffects.STUN.get(), STUN_DURATION_TICKS, 0));
             spawnFallingBlade(level, player, target);
         }
@@ -170,5 +174,11 @@ public class TexasBladeItem extends SwordItem implements CrosshairCounterItem, A
     @Override
     public String getCrosshairCounterText(ItemStack stack, Level level) {
         return getSwordrainElapsedSeconds(stack, level) + "/" + SWORDRAIN_COOLDOWN_SECONDS;
+    }
+
+    // Its skill puts no buff on the user, so the cooldown doesn't wait on any effect.
+    @Override
+    public boolean pausesWhileEffectActive() {
+        return false;
     }
 }

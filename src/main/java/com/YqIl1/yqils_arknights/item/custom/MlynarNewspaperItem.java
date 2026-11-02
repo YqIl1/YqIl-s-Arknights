@@ -56,7 +56,7 @@ public class MlynarNewspaperItem extends Item implements CrosshairCounterItem, A
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
 
-        if (!TimedActivation.isReady(itemstack, pLevel, MLYNAR_LAST_USED_KEY, MLYNAR_DURATION_TICKS, MLYNAR_COOLDOWN_TICKS)) {
+        if (!isSkillReady(itemstack, pLevel, pPlayer)) {
             return InteractionResultHolder.fail(itemstack);
         }
 
@@ -82,6 +82,11 @@ public class MlynarNewspaperItem extends Item implements CrosshairCounterItem, A
 
     public static int getMlynarElapsedSeconds(ItemStack stack, Level level) {
         return TimedActivation.getElapsedSeconds(stack, level, MLYNAR_LAST_USED_KEY, MLYNAR_DURATION_TICKS, MLYNAR_COOLDOWN_SECONDS);
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level, Player player) {
+        return skillElapsedSeconds(stack, level, player) + "/" + MLYNAR_COOLDOWN_SECONDS;
     }
 
     @Override

@@ -59,7 +59,7 @@
   "item.yqils_arknights.eyjafjalla_wand.decription": "Use to shoot a projectile dealing magic damage \nShift right click activates Volcano for 15s",
 
   "effect.yqils_arknights.eyjafjalla_wand_power": "Volcano",
-  "effect.yqils_arknights.eyjafjalla_wand_power.description": "Range increase; Attack Interval reduce by 1.1 seconds; Ranged Attacks shoots 5 extra projectile in random directions with 50% ATK",
+  "effect.yqils_arknights.eyjafjalla_wand_power.description": "ATK +130%; Range increases; Attack Interval reduces significantly; Attack becomes randomly shooting lava that can hit at most 6 enemies within 16 blocks, each dealing 50% ATK as Arts damage",
 
   "item.yqils_arknights.ifrit_flamethrower": "Ifrit's Flamethrower",
   "item.yqils_arknights.ifrit_flamethrower.description": "Use to continuously deal magic damage to enemy in front, cost 3 durability every second, recover 1 per second when not used, doubles when above half durability \nEvery 7 seconds, gain a charge of Pyroclasm(Can store 3 charges): Deals 250% of ATK Arts damage in the next attack; Targets' gain Immolation for 3 seconds",
@@ -80,7 +80,7 @@
   "effect.yqils_arknights.nearl_shield_power.description": "Heal equal to 33% of ATK every 2.5s",
 
   "item.yqils_arknights.prts": "PRTS",
-  "item.yqils_arknights.prts.description": "Use to activate all activatable skill in inventory",
+  "item.yqils_arknights.prts.description": "Hold right click to open the command wheel: attack, stay, follow, rally, or activate all carried skills",
 
   "item.yqils_arknights.texas_blade": "Texas's Sword",
   "item.yqils_arknights.texas_blade.description": "Use to trigger Sword Rain: Deals 170% ATK as magic damage twice to all nearby enemies and Stuns them for 3 seconds",
@@ -98,5 +98,20 @@
   "item.yqils_arknights.ceobe_spear.description": "Right click to gain \"Really Heavy Spear\" for 60 seconds, cooldown 80 seconds",
   "effect.yqils_arknights.ceobe_spear_power": "\"Really Heavy Spear\"",
   "effect.yqils_arknights.ceobe_spear_power.description": "ATK +210%, attacks silence targets for 5 seconds, the spear can be thrown",
-  "entity.yqils_arknights.thrown_ceobe_spear": "Really Heavy Spear"
+  "entity.yqils_arknights.thrown_ceobe_spear": "Really Heavy Spear",
+  "gui.yqils_arknights.prts.title": "PRTS",
+  "gui.yqils_arknights.prts.attack": "Attack",
+  "gui.yqils_arknights.prts.stay": "Stay",
+  "gui.yqils_arknights.prts.follow": "Follow",
+  "gui.yqils_arknights.prts.move": "Rally",
+  "gui.yqils_arknights.prts.skills": "Skills",
+  "gui.yqils_arknights.prts.target": "Target: %s",
+  "gui.yqils_arknights.prts.no_target": "No target",
+  "message.yqils_arknights.prts.attack": "%s operators ordered to attack",
+  "message.yqils_arknights.prts.stay": "%s operators ordered to stay",
+  "message.yqils_arknights.prts.follow": "%s operators following",
+  "message.yqils_arknights.prts.move": "%s operators moving to the rally point",
+  "message.yqils_arknights.prts.no_units": "No operators to command",
+  "death.attack.yqils_arknights.weapon_magic": "%1$s was slain by %2$s using %3$s",
+  "death.attack.yqils_arknights.sword_rain": "%1$s was pierced by the Sword Rain of %2$s's %3$s"
 }

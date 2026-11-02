@@ -387,4 +387,123 @@ public class ModEventHandlers {
             event.setResult(Event.Result.DENY);
         }
     }
+
+    // ===================== Stun on players (server side) =====================
+    // Backs up client/StunInput: a stunned player can't attack, interact with blocks/entities/items, break or
+    // place blocks, and stops using whatever it was using (without finishing it -- no eating through a stun).
+
+    private static boolean isStunnedPlayer(@Nullable Entity entity) {
+        return entity instanceof Player player && player.hasEffect(ModEffects.STUN.get());
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedAttack(AttackEntityEvent event) {
+        if (isStunnedPlayer(event.getEntity())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedRightClickItem(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem event) {
+        if (isStunnedPlayer(event.getEntity())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedRightClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+        if (isStunnedPlayer(event.getEntity())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedLeftClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock event) {
+        if (isStunnedPlayer(event.getEntity())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedEntityInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
+        if (isStunnedPlayer(event.getEntity())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedEntityInteractSpecific(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific event) {
+        if (isStunnedPlayer(event.getEntity())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedBreak(BlockEvent.BreakEvent event) {
+        if (isStunnedPlayer(event.getPlayer())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedPlace(BlockEvent.EntityPlaceEvent event) {
+        if (isStunnedPlayer(event.getEntity())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onStunnedUseStart(LivingEntityUseItemEvent.Start event) {
+        if (isStunnedPlayer(event.getEntity())) event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public static void onStunnedPlayerTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!entity.level().isClientSide && isStunnedPlayer(entity) && entity.isUsingItem()) {
+            entity.stopUsingItem();
+        }
+    }
+
+    // ===================== PRTS command goals =====================
+    // Every ownable mob gets the two PRTS goals (idle unless it has a PRTS order -- see entity/ai/PrtsOrders).
+    // Added on every join, guarded against duplicates.
+    @SubscribeEvent
+    public static void onPrtsGoals(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide() || !(event.getEntity() instanceof Mob mob)
+                || !(mob instanceof net.minecraft.world.entity.OwnableEntity)) {
+            return;
+        }
+        boolean present = mob.goalSelector.getAvailableGoals().stream()
+                .anyMatch(g -> g.getGoal() instanceof com.YqIl1.yqils_arknights.entity.ai.PrtsHoldGoal);
+        if (!present) {
+            mob.goalSelector.addGoal(0, new com.YqIl1.yqils_arknights.entity.ai.PrtsHoldGoal(mob));
+            mob.targetSelector.addGoal(0, new com.YqIl1.yqils_arknights.entity.ai.PrtsAttackTargetGoal(mob));
+        }
+    }
+
+    // Typhon's skill arrows fall onto a crowd, so one can hit something it wasn't aimed at: apply the same
+    // SkillTargeting rule to the actual hit (your own creatures, and others' outside PvP, take no damage).
+    @SubscribeEvent
+    public static void onSkillArrowFriendlyHit(LivingAttackEvent event) {
+        DamageSource source = event.getSource();
+        if (source.getDirectEntity() != null
+                && source.getDirectEntity().getPersistentData().getBoolean(TyphonGreatbowItem.SKILL_ARROW_TAG)
+                && source.getEntity() instanceof Player shooter
+                && !com.YqIl1.yqils_arknights.util.SkillTargeting.canSkillHit(shooter, event.getEntity())) {
+            event.setCanceled(true);
+        }
+    }
+
+    // ===================== Skill cooldowns wait for the effect to end =====================
+    // When a skill buff leaves a player (runs out, milk, Silence stripping it, death...), record that moment on
+    // every stack of the matching skill item they carry, so the cooldown starts then and not at the nominal end
+    // (see TimedActivation effect-aware variants). One NBT write per buff, not per tick.
+    @SubscribeEvent
+    public static void onSkillEffectRemoved(MobEffectEvent.Remove event) {
+        if (event.getEffect() != null) skillEffectEnded(event.getEntity(), event.getEffect());
+    }
+
+    @SubscribeEvent
+    public static void onSkillEffectExpired(MobEffectEvent.Expired event) {
+        if (event.getEffectInstance() != null) skillEffectEnded(event.getEntity(), event.getEffectInstance().getEffect());
+    }
+
+    private static void skillEffectEnded(LivingEntity entity, MobEffect effect) {
+        if (entity.level().isClientSide || !(entity instanceof Player player)) return;
+        net.minecraft.world.entity.player.Inventory inv = player.getInventory();
+        for (java.util.List<net.minecraft.world.item.ItemStack> list : java.util.List.of(inv.items, inv.offhand)) {
+            for (net.minecraft.world.item.ItemStack stack : list) {
+                if (stack.getItem() instanceof com.YqIl1.yqils_arknights.item.custom.ActivatableSkillItem skill
+                        && skill.pausingEffect() == effect
+                        && com.YqIl1.yqils_arknights.util.TimedActivation.awaitingEffectEnd(stack, skill.getSkillLastUsedKey())) {
+                    com.YqIl1.yqils_arknights.util.TimedActivation.markEffectEnded(stack, player.level(), skill.getSkillLastUsedKey());
+                }
+            }
+        }
+    }
 }

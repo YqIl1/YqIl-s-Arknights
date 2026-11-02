@@ -22,6 +22,12 @@ public class LapplandBladeProjectile extends ThrowableItemProjectile {
     private static final int MAX_LIFETIME_TICKS = 60; // 3 seconds
 
     private float damage = 6.0F;
+    // The weapon that fired this, for the death message (WeaponMagicDamageSource). Not saved: it only lives 3 s.
+    private net.minecraft.world.item.ItemStack weapon = net.minecraft.world.item.ItemStack.EMPTY;
+
+    public void setWeapon(net.minecraft.world.item.ItemStack weapon) {
+        this.weapon = weapon.copy();
+    }
 
     public LapplandBladeProjectile(EntityType<? extends LapplandBladeProjectile> type, Level level) {
         super(type, level);
@@ -63,7 +69,7 @@ public class LapplandBladeProjectile extends ThrowableItemProjectile {
         Entity projectileOwner = this.getOwner();
         boolean hasPower = projectileOwner instanceof LivingEntity livingOwner && livingOwner.hasEffect(ModEffects.LAPPLAND_BLADE_POWER.get());
         DamageSource damageSource = hasPower
-                ? this.damageSources().indirectMagic(this, projectileOwner)
+                ? com.YqIl1.yqils_arknights.damage.WeaponMagicDamageSource.magic(this, projectileOwner, this.weapon)
                 : this.damageSources().thrown(this, projectileOwner);
         target.hurt(damageSource, this.damage);
 

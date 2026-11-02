@@ -30,11 +30,32 @@ public interface ActivatableSkillItem {
         return ModSound.MLYNAR_POWER;
     }
 
+    // True if the skill's effect is a buff on the user, so the cooldown should wait while it's active
+    // (TimedActivation effect-aware variants). Skills whose "effect" lands on others (Texas's Stun) or that
+    // have none (Typhon) override this to false.
+    default boolean pausesWhileEffectActive() {
+        return true;
+    }
+
+    default net.minecraft.world.effect.MobEffect pausingEffect() {
+        return pausesWhileEffectActive() && getSkillEffect() != null ? getSkillEffect().get() : null;
+    }
+
+    default boolean isSkillReady(ItemStack stack, Level level, @org.jetbrains.annotations.Nullable net.minecraft.world.entity.LivingEntity holder) {
+        return TimedActivation.isReady(stack, level, getSkillLastUsedKey(), getSkillDurationTicks(), getSkillCooldownTicks(), holder, pausingEffect());
+    }
+
+    // Seconds of cooldown done, 0 while the effect is still on the holder.
+    default int skillElapsedSeconds(ItemStack stack, Level level, @org.jetbrains.annotations.Nullable net.minecraft.world.entity.LivingEntity holder) {
+        return TimedActivation.getElapsedSeconds(stack, level, getSkillLastUsedKey(), getSkillDurationTicks(),
+                getSkillCooldownTicks() / 20, holder, pausingEffect());
+    }
+
     // Activates the skill if it's currently off cooldown (server-side only). Returns true if it
     // actually activated, false if it was still on cooldown -- callers that just want to fire every
     // ready skill can ignore the return value.
     default boolean activateSkill(ItemStack stack, Level level, Player player) {
-        if (level.isClientSide || !TimedActivation.isReady(stack, level, getSkillLastUsedKey(), getSkillDurationTicks(), getSkillCooldownTicks())) {
+        if (level.isClientSide || !isSkillReady(stack, level, player)) {
             return false;
         }
 

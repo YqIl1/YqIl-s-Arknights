@@ -17,8 +17,13 @@ public final class TyphonGreatbowClient {
     // falls back to GeckoLib's per-stack id, in case the rendered stack and the use stack are different
     // copies (e.g. right after a server sync replaced the stack).
     public static boolean isBeingDrawn(ItemStack stack) {
+        return drawer(stack) != null;
+    }
+
+    // The player currently drawing this bow, or null.
+    public static AbstractClientPlayer drawer(ItemStack stack) {
         ClientLevel level = Minecraft.getInstance().level;
-        if (level == null) return false;
+        if (level == null) return null;
 
         for (AbstractClientPlayer player : level.players()) {
             if (!player.isUsingItem()) continue;
@@ -29,9 +34,9 @@ public final class TyphonGreatbowClient {
             if (using == stack
                     || player.getItemInHand(player.getUsedItemHand()) == stack
                     || (id != Long.MAX_VALUE && id == GeoItem.getId(using))) {
-                return true;
+                return player;
             }
         }
-        return false;
+        return null;
     }
 }

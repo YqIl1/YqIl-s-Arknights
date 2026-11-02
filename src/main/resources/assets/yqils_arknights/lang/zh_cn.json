@@ -62,7 +62,7 @@
   "item.yqils_arknights.eyjafjalla_wand.decription": "使用时进行远程攻击\nShift右键开启火山，持续15秒",
 
   "effect.yqils_arknights.eyjafjalla_wand_power": "火山",
-  "effect.yqils_arknights.eyjafjalla_wand_power.description": "距离提升; 攻击间隔缩短1.1秒; 远程攻击额外创造5发随机方向造成50%攻击力法术伤害的投掷物",
+  "effect.yqils_arknights.eyjafjalla_wand_power.description": "攻击力+130%；攻击范围扩大；攻击间隔大幅缩短；攻击变为随机向16格范围内最多6名敌人发射熔岩，每发造成50%攻击力的法术伤害",
 
   "item.yqils_arknights.ifrit_flamethrower": "伊芙利特的喷火器",
   "item.yqils_arknights.ifrit_flamethrower.description": "使用时持续对前方敌人造成魔法伤害, 每秒失去3点耐久, 不使用时每秒恢复1点耐久，高于一半耐久时恢复翻倍 \n每七秒, 获得一层炎爆充能（可充能3次）: 下次攻击造成相当于攻击力250%的法术伤害，命中目标获得3秒灼伤",
@@ -83,7 +83,7 @@
   "effect.yqils_arknights.nearl_shield_power.description": "每2.5秒回复33%攻击力的血量",
 
   "item.yqils_arknights.prts": "PRTS",
-  "item.yqils_arknights.prts.description": "使用时激活所有已携带的可激活技能",
+  "item.yqils_arknights.prts.description": "按住右键打开指挥轮盘：攻击、待命、跟随、集结，或激活所有已携带的技能",
 
   "item.yqils_arknights.texas_blade": "德克萨斯的剑",
   "item.yqils_arknights.texas_blade.description": "使用触发剑雨：对周围所有敌人造成两次相当于攻击力170%的魔法伤害，并令击中目标晕眩3秒",
@@ -101,5 +101,20 @@
   "item.yqils_arknights.ceobe_spear.description": "右键获得“很重的枪”，持续60秒，冷却80秒",
   "effect.yqils_arknights.ceobe_spear_power": "“很重的枪”",
   "effect.yqils_arknights.ceobe_spear_power.description": "攻击力+210%，攻击使目标沉默5秒，长枪可以投掷",
-  "entity.yqils_arknights.thrown_ceobe_spear": "很重的枪"
+  "entity.yqils_arknights.thrown_ceobe_spear": "很重的枪",
+  "gui.yqils_arknights.prts.title": "PRTS",
+  "gui.yqils_arknights.prts.attack": "攻击",
+  "gui.yqils_arknights.prts.stay": "待命",
+  "gui.yqils_arknights.prts.follow": "跟随",
+  "gui.yqils_arknights.prts.move": "集结",
+  "gui.yqils_arknights.prts.skills": "技能",
+  "gui.yqils_arknights.prts.target": "目标：%s",
+  "gui.yqils_arknights.prts.no_target": "未指向目标",
+  "message.yqils_arknights.prts.attack": "已命令 %s 名干员发起攻击",
+  "message.yqils_arknights.prts.stay": "已命令 %s 名干员待命",
+  "message.yqils_arknights.prts.follow": "%s 名干员恢复跟随",
+  "message.yqils_arknights.prts.move": "已命令 %s 名干员前往集结点",
+  "message.yqils_arknights.prts.no_units": "没有可指挥的干员",
+  "death.attack.yqils_arknights.weapon_magic": "%1$s 被 %2$s 用 %3$s 击杀",
+  "death.attack.yqils_arknights.sword_rain": "%1$s 被 %2$s 用 %3$s 召唤的剑雨贯穿"
 }

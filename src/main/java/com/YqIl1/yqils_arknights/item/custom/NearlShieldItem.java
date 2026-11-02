@@ -39,10 +39,13 @@ public class NearlShieldItem extends ShieldItem implements CrosshairCounterItem,
     private final Multimap<Attribute, AttributeModifier> offhandModifiers;
 
     public NearlShieldItem(Properties p_43089_) {
-        super(p_43089_.rarity(Rarity.EPIC).durability(870));
+        super(p_43089_.rarity(Rarity.EPIC).durability(1740));
         ImmutableMultimap.Builder<Attribute, AttributeModifier> mainBuilder = ImmutableMultimap.builder();
         mainBuilder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(
                 BASE_ATTACK_DAMAGE_UUID, "Base attack damage", 8.0D, AttributeModifier.Operation.ADDITION));
+        // 1.6 attack speed in the main hand (4.0 base - 2.4), same as a sword.
+        mainBuilder.put(Attributes.ATTACK_SPEED, new AttributeModifier(
+                BASE_ATTACK_SPEED_UUID, "Base attack speed", -2.4D, AttributeModifier.Operation.ADDITION));
         this.mainhandModifiers = mainBuilder.build();
 
         ImmutableMultimap.Builder<Attribute, AttributeModifier> offBuilder = ImmutableMultimap.builder();
@@ -95,6 +98,11 @@ public class NearlShieldItem extends ShieldItem implements CrosshairCounterItem,
 
     public static int getFirstAidElapsedSeconds(ItemStack stack, Level level) {
         return TimedActivation.getElapsedSeconds(stack, level, FIRST_AID_LAST_USED_KEY, FIRST_AID_DURATION_TICKS, FIRST_AID_COOLDOWN_SECONDS);
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level, Player player) {
+        return skillElapsedSeconds(stack, level, player) + "/" + FIRST_AID_COOLDOWN_SECONDS;
     }
 
     @Override

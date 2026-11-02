@@ -7,7 +7,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraftforge.common.ForgeMod;
 
 import java.util.UUID;
@@ -47,7 +46,7 @@ public class MlynarPowerEffect extends MobEffect {
         long nearbyEnemies = entity.level().getEntitiesOfClass(
                 LivingEntity.class,
                 entity.getBoundingBox().inflate(ENEMY_BOOST_RADIUS),
-                e -> e instanceof Enemy && e.isAlive()
+                e -> com.YqIl1.yqils_arknights.util.EnemyTargeting.isEnemyOf(entity, e)
         ).size();
 
         boolean thresholdMet = nearbyEnemies >= ENEMY_BOOST_THRESHOLD;

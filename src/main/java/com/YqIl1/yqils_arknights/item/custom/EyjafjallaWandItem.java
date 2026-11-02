@@ -31,12 +31,19 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem, Ac
     private static final String VOLCANO_LAST_USED_KEY = "yqils_arknights:volcano_last_used";
     public static final int VOLCANO_DURATION_TICKS = 300; // 15s buff
     public static final int VOLCANO_COOLDOWN_TICKS = 1600; // 80s, starts once the buff ends
+    private static final int VOLCANO_SHOTS = 6;                // at most; fewer if fewer enemies are around
+    private static final double VOLCANO_TARGET_RADIUS = 16.0D;
+    private static final int VOLCANO_MIN_COOLDOWN_TICKS = 2; // fastest Volcano volley: every 0.1 s
+    private static final double VOLCANO_HEAD_OFFSET = 0.5D;  // spawn this far above the top of the head
+    private static final int VOLCANO_LIFETIME = 100;          // 5 s, room to curve onto a target
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public EyjafjallaWandItem(Properties p_41383_) {
-        super(p_41383_.rarity(Rarity.EPIC).stacksTo(1).durability(512));
+        super(p_41383_.rarity(Rarity.EPIC).stacksTo(1).durability(1018));
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Base attack damage", 7.0D, AttributeModifier.Operation.ADDITION));
+        // 1.6 attack speed, like a sword (4.0 base - 2.4); the shot cooldown below follows it.
+        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Base attack speed", -2.4D, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = builder.build();
     }
 
@@ -57,20 +64,31 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem, Ac
         ItemStack itemstack = player.getItemInHand(interactionHand);
         boolean hasPower = player.hasEffect(ModEffects.EYJAFJALLA_WAND_POWER.get());
 
-        int cooldown = 8;
         if (!level.isClientSide) {
             if (player.isShiftKeyDown()) {
                 activateSkill(itemstack, level, player);
             }
             float rangedDamage = (float)player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+            java.util.List<net.minecraft.world.entity.LivingEntity> enemies = new java.util.ArrayList<>();
             if (hasPower) {
-                rangedDamage /= 2;
-                cooldown = 2;
-                for(int i = 0; i < 4; i++){
-                    fireProjectile(level,player,rangedDamage,3+(float)Math.random()*6,45-(float)Math.random()*90,90);
-                }
+                enemies.addAll(com.YqIl1.yqils_arknights.util.EnemyTargeting.enemiesNear(
+                        player, player.getBoundingBox().inflate(VOLCANO_TARGET_RADIUS)));
+                enemies.removeIf(e -> e.distanceToSqr(player) > VOLCANO_TARGET_RADIUS * VOLCANO_TARGET_RADIUS);
+                java.util.Collections.shuffle(enemies);
             }
-            fireProjectile(level,player,rangedDamage,2,0,60);
+            if (!enemies.isEmpty()) {
+                // Volcano (ATK +130% from the effect): one lava shot per nearby enemy -- up to 6, each on a different
+                // enemy picked at random -- launched from above the player's head straight at its enemy, then
+                // homing to follow it as it moves, each dealing half ATK.
+                float shotDamage = rangedDamage / 2;
+                int shots = Math.min(VOLCANO_SHOTS, enemies.size());
+                for (int i = 0; i < shots; i++) {
+                    fireVolcanoShot(level, player, shotDamage, enemies.get(i));
+                }
+            } else {
+                // Normal shot (also during Volcano when no enemy is around -- still with the faster cooldown).
+                fireProjectile(level,player,rangedDamage,2,0,60);
+            }
 
             itemstack.hurtAndBreak(1, player, (entity) -> entity.broadcastBreakEvent(interactionHand));
 
@@ -80,7 +98,7 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem, Ac
 
         }
 
-        player.getCooldowns().addCooldown(this, 2*cooldown);
+        player.getCooldowns().addCooldown(this, shotCooldownTicks(player, hasPower));
 
 
         return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
@@ -88,8 +106,25 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem, Ac
 
     public static final int VOLCANO_COOLDOWN_SECONDS = VOLCANO_COOLDOWN_TICKS / 20;
 
+    // Shot cooldown follows attack speed like a melee swing: 20 / ATTACK_SPEED ticks (~0.65 s at the wand's
+    // 1.6), and 4x faster while Volcano is active (as before). Same on both sides so the client agrees.
+    private static int shotCooldownTicks(Player player, boolean hasPower) {
+        double speed = com.YqIl1.yqils_arknights.util.SkillAttackSpeed.of(player); // capped at 4.0
+        double ticks = 20.0D / speed;
+        if (hasPower) {
+            ticks /= 4.0D;
+            return Math.max(VOLCANO_MIN_COOLDOWN_TICKS, (int) Math.round(ticks)); // Volcano never faster than 0.1 s
+        }
+        return Math.max(1, (int) Math.round(ticks));
+    }
+
     public static int getVolcanoElapsedSeconds(ItemStack stack, Level level) {
         return TimedActivation.getElapsedSeconds(stack, level, VOLCANO_LAST_USED_KEY, VOLCANO_DURATION_TICKS, VOLCANO_COOLDOWN_SECONDS);
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level, Player player) {
+        return skillElapsedSeconds(stack, level, player) + "/" + VOLCANO_COOLDOWN_SECONDS;
     }
 
     @Override
@@ -122,8 +157,24 @@ public class EyjafjallaWandItem extends Item implements CrosshairCounterItem, Ac
         return ModSound.EYJAFJALLA_WAND_POWER;
     }
 
+    // Volcano shot: spawned above the head and fired straight at its target; homing keeps it on target.
+    private EyjafjallaWandProjectile fireVolcanoShot(Level level, Player player, float dmg, net.minecraft.world.entity.LivingEntity target) {
+        EyjafjallaWandProjectile projectile = new EyjafjallaWandProjectile(level, player);
+        projectile.setWeapon(player.getMainHandItem().getItem() == this ? player.getMainHandItem() : player.getOffhandItem());
+        projectile.setMaxLifetime(VOLCANO_LIFETIME);
+        projectile.setDamage(dmg);
+        projectile.setPos(player.getX(), player.getY() + player.getBbHeight() + VOLCANO_HEAD_OFFSET, player.getZ());
+        net.minecraft.world.phys.Vec3 aim = target.getBoundingBox().getCenter().subtract(projectile.position());
+        projectile.shoot(aim.x, aim.y, aim.z, 1.5F, 0.0F); // no spread: straight at the target
+        projectile.setHomingTarget(target);
+        projectile.setVolcano(true);
+        level.addFreshEntity(projectile);
+        return projectile;
+    }
+
     private EyjafjallaWandProjectile fireProjectile(Level level, Player player, float dmg, float xOffset, float yOffset, int lifetime) {
         EyjafjallaWandProjectile projectile = new EyjafjallaWandProjectile(level, player);
+        projectile.setWeapon(player.getMainHandItem().getItem() == this ? player.getMainHandItem() : player.getOffhandItem());
         projectile.setMaxLifetime(lifetime);
         projectile.setDamage(dmg);
         projectile.shootFromRotation(player, player.getXRot()-xOffset, player.getYRot()+yOffset, 0.0F, 1.5F, 1.0F);

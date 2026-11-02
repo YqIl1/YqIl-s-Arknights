@@ -122,3 +122,6 @@ run-data/
 # local only
 old chat/
 backup/
+
+# Claude project guide (local only)
+CLAUDE.md

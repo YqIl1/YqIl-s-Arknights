@@ -38,10 +38,12 @@ import java.util.function.Consumer;
 
 public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem {
     private static final double CONE_HALF_ANGLE_DEGREES = 30.0;
-    private static final int DAMAGE_INTERVAL_TICKS = 5; // apply damage 2x/sec
+    // Damage interval follows attack speed like a melee swing: 20 / ATTACK_SPEED ticks. The flamethrower has
+    // 2.5 attack speed (4.0 base - 1.5), so 8 ticks = 2.5 hits/sec by default.
+    private static final double ATTACK_SPEED_BONUS = -1.5D;
+    private static final int IGNITE_SECONDS = 3;
     private static final int PARTICLE_STEPS = 6; // clusters spaced along the stream, from face to max range
     private static final int PARTICLES_PER_STEP = 2;
-    private static final int PARTICLE_VISIBLE_TICKS = 5; // how long the stream shows per attack
 
     // Skill effect: the next damage application after activation deals 250% damage and applies
     // Immolation (3s) to everything it hits, then reverts to normal until the skill fires again.
@@ -166,6 +168,8 @@ public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem 
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(
                 BASE_ATTACK_DAMAGE_UUID, "Base attack damage", 3.0D, AttributeModifier.Operation.ADDITION));
+        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(
+                BASE_ATTACK_SPEED_UUID, "Base attack speed", ATTACK_SPEED_BONUS, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = builder.build();
     }
 
@@ -215,22 +219,21 @@ public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem 
             stack.hurtAndBreak(3, entity, player -> player.broadcastBreakEvent(EquipmentSlot.MAINHAND));
         }
 
-        if (remainingUseDuration % DAMAGE_INTERVAL_TICKS == 0) {
+        int interval = damageIntervalTicks(entity);
+        int elapsed = this.getUseDuration(stack) - remainingUseDuration;
+        boolean attackTick = elapsed % interval == 0;
+
+        if (attackTick) {
             tryActivateSkill(level, entity, stack);
         }
 
         double range = entity.getAttributeValue(ForgeMod.ENTITY_REACH.get())+9;
         Vec3 lookVec = entity.getLookAngle();
 
-        // Particles stay visible for PARTICLE_VISIBLE_TICKS starting at each real attack tick,
-        // instead of a single-tick pop or spawning every tick regardless of whether an attack happened.
-        int ticksIntoInterval = (int) (remainingUseDuration % DAMAGE_INTERVAL_TICKS);
-        int ticksSinceAttack = (DAMAGE_INTERVAL_TICKS - ticksIntoInterval) % DAMAGE_INTERVAL_TICKS;
-        if (ticksSinceAttack < PARTICLE_VISIBLE_TICKS) {
-            spawnFlameStream(level, entity, lookVec, range);
-        }
+        // The flame stream shows the whole time the trigger is held; damage lands every `interval` ticks.
+        spawnFlameStream(level, entity, lookVec, range);
 
-        if (ticksIntoInterval != 0) {
+        if (!attackTick) {
             return;
         }
 
@@ -239,7 +242,11 @@ public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem 
         List<LivingEntity> targets = level.getEntitiesOfClass(
                 LivingEntity.class,
                 entity.getBoundingBox().inflate(range),
+                // Same target rule as Texas's Sword Rain (SkillTargeting): never your own creatures, other players
+                // and their creatures only with PvP. A non-player wielder hits anything but itself.
                 target -> target != entity && target.isAlive()
+                        && (!(entity instanceof net.minecraft.world.entity.player.Player p)
+                            || com.YqIl1.yqils_arknights.util.SkillTargeting.canSkillHit(p, target))
         );
 
         CompoundTag tag = stack.getOrCreateTag();
@@ -257,7 +264,11 @@ public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem 
         for (LivingEntity target : targets) {
             Vec3 toTarget = target.position().subtract(entity.position()).normalize();
             if (lookVec.dot(toTarget) >= cosThreshold) {
-                target.hurt(entity.damageSources().indirectMagic(entity, entity), damage);
+                // The interval already sets the hit rate, so don't let the target's hurt cooldown swallow hits.
+                target.invulnerableTime = 0;
+                if (target.hurt(entity.damageSources().indirectMagic(entity, entity), damage)) {
+                    target.setSecondsOnFire(IGNITE_SECONDS); // re-applied every hit, so it burns while you spray + 3 s
+                }
                 if (boosted) {
                     target.getPersistentData().putFloat(ImmolationEffect.SOURCE_DAMAGE_KEY, immolationDamage);
                     target.getPersistentData().putUUID(ImmolationEffect.SOURCE_UUID_KEY, entity.getUUID());
@@ -271,7 +282,7 @@ public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem 
         }
     }
 
-    // Consumes a banked charge and fires the skill. Called on the same DAMAGE_INTERVAL_TICKS cadence
+    // Consumes a banked charge and fires the skill. Called on the same damage-interval cadence
     // as the damage loop, so banked charges drain one per damage tick instead of all at once.
     private static void tryActivateSkill(Level level, LivingEntity entity, ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
@@ -347,5 +358,11 @@ public class IfritFlamethrowerItem extends Item implements CrosshairCounterItem 
         public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
             return FLAMETHROWER_HOLD;
         }
+    }
+
+    // 20 / ATTACK_SPEED ticks between damage applications (8 at the flamethrower's own 2.5).
+    private static int damageIntervalTicks(LivingEntity entity) {
+        double speed = com.YqIl1.yqils_arknights.util.SkillAttackSpeed.of(entity); // capped at 4.0
+        return Math.max(1, (int) Math.round(20.0D / speed));
     }
 }

@@ -58,11 +58,12 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
     public static final int SKILL_COOLDOWN_SECONDS = 80;
     public static final int SKILL_COOLDOWN_TICKS = SKILL_COOLDOWN_SECONDS * 20;
     public static final int SILENCE_DURATION_TICKS = 5 * 20;
-    private static final int MIN_THROW_CHARGE_TICKS = 14; // 0.7 s per throw
+    // Throw charge follows attack speed like a melee swing: 20 / ATTACK_SPEED ticks, i.e. 0.9 s at the
+    // spear's own 1.1 attack speed; faster with Haste / attack-speed buffs.
     // Pause after each throw before the next charge starts. Implemented by restarting the hold this many
     // ticks "early", so the elapsed charge is negative during the pause.
     public static final int THROW_PAUSE_TICKS = 4; // 0.2 s
-    private static final float THROW_PITCH_UP_DEGREES = 5.0F; // aim a little above the crosshair
+    private static final float THROW_PITCH_UP_DEGREES = 0.0F; // aim a little above the crosshair
     private static final double THROW_HEIGHT_OFFSET = 0.1D; // spawn a little above the default (eye - 0.1)
 
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
@@ -71,7 +72,7 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
     private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("idle");
 
     public CeobeSpearItem(Properties properties) {
-        super(properties.rarity(Rarity.EPIC).stacksTo(1).durability(250));
+        super(properties.rarity(Rarity.EPIC).stacksTo(1).durability(1250));
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(
                 BASE_ATTACK_DAMAGE_UUID, "Tool modifier", 8.0D, AttributeModifier.Operation.ADDITION));
@@ -182,7 +183,7 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     ModSound.CEOBE_SPEAR_POWER_CHARGE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
-        if (elapsed < MIN_THROW_CHARGE_TICKS) return remaining;
+        if (elapsed < throwChargeTicks(player)) return remaining;
         if (!player.hasEffect(ModEffects.CEOBE_SPEAR_POWER.get())) return remaining; // skill ended mid-hold: just hold
         if (stack.getDamageValue() >= stack.getMaxDamage() - 1) return remaining; // don't break the spear
 
@@ -191,6 +192,11 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
         }
         player.awardStat(Stats.ITEM_USED.get(this));
         return this.getUseDuration(stack) + THROW_PAUSE_TICKS;
+    }
+
+    public static int throwChargeTicks(LivingEntity entity) {
+        double speed = com.YqIl1.yqils_arknights.util.SkillAttackSpeed.of(entity); // capped at 4.0
+        return Math.max(1, (int) Math.round(20.0D / speed));
     }
 
     // Spawns a separate projectile carrying the thrower's current ATTACK_DAMAGE (so the skill's +210%
@@ -231,6 +237,11 @@ public class CeobeSpearItem extends Item implements CrosshairCounterItem, Activa
     @Override
     public RegistryObject<SoundEvent> getSkillSound() {
         return null;
+    }
+
+    @Override
+    public String getCrosshairCounterText(ItemStack stack, Level level, Player player) {
+        return skillElapsedSeconds(stack, level, player) + "/" + SKILL_COOLDOWN_SECONDS;
     }
 
     @Override

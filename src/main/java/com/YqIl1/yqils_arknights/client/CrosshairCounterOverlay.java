@@ -15,6 +15,20 @@ public class CrosshairCounterOverlay implements IGuiOverlay {
     private static final int OFFSET_X = 12; // to the right of the crosshair
     private static final int OFFSET_Y = -4;
 
+    // Small lime lightning bolt drawn in front of the counter (palette accent #CCEC44), 5x7 pixels.
+    private static final int BOLT_COLOR = 0xFFCCEC44;
+    private static final String[] BOLT = {
+            "...##",
+            "..##.",
+            ".##..",
+            "#####",
+            "..##.",
+            ".##..",
+            "##...",
+    };
+    private static final int BOLT_W = 5;
+    private static final int BOLT_GAP = 2;
+
     @Override
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         Player player = Minecraft.getInstance().player;
@@ -34,22 +48,34 @@ public class CrosshairCounterOverlay implements IGuiOverlay {
             return;
         }
 
-        String mainText = display.getCrosshairCounterText(stack, player.level());
+        String mainText = display.getCrosshairCounterText(stack, player.level(), player);
         String secondaryText = display.getCrosshairSecondaryText(stack, player.level());
 
         Font font = Minecraft.getInstance().font;
         int mainY = screenHeight / 2 + OFFSET_Y;
+        // Bolt then text: main hand grows rightwards from the crosshair, off hand leftwards.
         int mainX = offhand
                 ? screenWidth / 2 - OFFSET_X - font.width(mainText)
-                : screenWidth / 2 + OFFSET_X;
+                : screenWidth / 2 + OFFSET_X + BOLT_W + BOLT_GAP;
+        drawBolt(guiGraphics, mainX - BOLT_W - BOLT_GAP, mainY);
         guiGraphics.drawString(font, mainText, mainX, mainY, 0xFFFFFF);
 
         if (secondaryText != null) {
             int secondaryY = mainY - (font.lineHeight + 1);
             int secondaryX = offhand
                     ? screenWidth / 2 - OFFSET_X - font.width(secondaryText)
-                    : screenWidth / 2 + OFFSET_X;
+                    : mainX;
             guiGraphics.drawString(font, secondaryText, secondaryX, secondaryY, display.getCrosshairSecondaryColor());
+        }
+    }
+
+    private static void drawBolt(GuiGraphics g, int x, int y) {
+        for (int row = 0; row < BOLT.length; row++) {
+            for (int col = 0; col < BOLT_W; col++) {
+                if (BOLT[row].charAt(col) == '#') {
+                    g.fill(x + col, y + row, x + col + 1, y + row + 1, BOLT_COLOR);
+                }
+            }
         }
     }
 }

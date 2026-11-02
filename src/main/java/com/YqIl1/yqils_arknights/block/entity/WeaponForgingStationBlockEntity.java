@@ -46,7 +46,7 @@ public class WeaponForgingStationBlockEntity extends BlockEntity implements Menu
     private final int OUTPUT_SLOT = 1;
     protected final ContainerData data;
     private int progress = 0;
-    private int maxProgress = 100;
+    private int maxProgress = 60; // 3 s (1 progress per tick)
     private int selectedRecipeIndex = -1;
     private boolean isProcessing = false;
 

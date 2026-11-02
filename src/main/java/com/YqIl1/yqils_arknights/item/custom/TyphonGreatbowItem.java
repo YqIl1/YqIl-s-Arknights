@@ -6,9 +6,6 @@ import com.YqIl1.yqils_arknights.util.TimedActivation;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.stats.Stats;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -29,12 +26,10 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
@@ -96,14 +91,15 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
     private static final int SKILL_DURATION_TICKS = 0;
 
     private static final double SCAN_RADIUS = 10.0;
-    // Every creature from Gathering Torches Become Sunlight can be locked, even if it doesn't count as a vanilla
-    // "Enemy". Matched by registry namespace, so there's no compile dependency and nothing breaks without it.
-    private static final String TORCHES_BECOME_SUNLIGHT_MODID = "torchesbecomesunlight";
     private static final double SPLASH_RADIUS = 4.0; // must match the lock circle ring (TyphonLockCircleRenderer)
     private static final int LOCKED_SHOTS = 10;
     // Full draw takes 1.5 s while a lock is active (vanilla bows: 20 ticks = 1 s).
+    // The bow's own attack speed is 2.0 (base 4.0 + ATTACK_SPEED_BONUS). Draw times below are at that speed
+    // and scale with the shooter's ATTACK_SPEED: faster attack speed (Haste, NC Deer Fan...) = faster draw.
     private static final float NORMAL_DRAW_TICKS = 20.0F;
     private static final float LOCKED_DRAW_TICKS = 30.0F;
+    private static final double REFERENCE_ATTACK_SPEED = 2.0D;
+    private static final double ATTACK_SPEED_BONUS = -2.0D; // 4.0 base -> 2.0 shown in the tooltip
     private static final int ARROWS_PER_SHOT = 5;
     private static final double DROP_HEIGHT = 6.0;    // blocks above the circle centre when there's no one to aim at
     private static final double HEAD_CLEARANCE = 2.0; // arrows appear this far above the victim's head
@@ -136,6 +132,8 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(
                 BASE_ATTACK_DAMAGE_UUID, "Base attack damage", ATTACK_DAMAGE_BONUS, AttributeModifier.Operation.ADDITION));
+        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(
+                BASE_ATTACK_SPEED_UUID, "Base attack speed", ATTACK_SPEED_BONUS, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = builder.build();
     }
 
@@ -188,7 +186,7 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
             // a small shake once past 10% draw, plus pulling toward the camera and stretching along the view
             // axis (the "zoom in") as the draw goes from 0 to full. Same formulas and constants as vanilla.
             float drawTicks = (float) itemInHand.getUseDuration() - ((float) player.getUseItemRemainingTicks() - partialTick + 1.0F);
-            float power = drawPower(drawTicks, fullDrawTicks(itemInHand));
+            float power = drawPower(drawTicks, fullDrawTicks(itemInHand, player));
             if (power > 0.1F) {
                 float shake = Mth.sin((drawTicks - 0.1F) * 1.3F) * (power - 0.1F);
                 poseStack.translate(0.0F, shake * 0.004F, 0.0F);
@@ -232,8 +230,10 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
             ItemStack stack = state.getData(DataTickets.ITEMSTACK);
             boolean inGui = state.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) == ItemDisplayContext.GUI;
             boolean drawing = stack != null && !inGui && TyphonGreatbowClient.isBeingDrawn(stack);
-            // "draw" is authored as 1 s; play it at 20/30 speed during the skill so it fills the 1.5 s draw.
-            state.setControllerSpeed(stack != null ? NORMAL_DRAW_TICKS / fullDrawTicks(stack) : 1.0F);
+            // "draw" is authored as 1 s (20 ticks); play it at 20 / (actual full-draw ticks) so it always ends
+            // exactly at full draw (longer during the skill, shorter/longer with attack speed).
+            net.minecraft.world.entity.LivingEntity drawer = stack != null ? TyphonGreatbowClient.drawer(stack) : null;
+            state.setControllerSpeed(stack != null && drawer != null ? NORMAL_DRAW_TICKS / fullDrawTicks(stack, drawer) : 1.0F);
             return state.setAndContinue(drawing ? DRAW_ANIM : IDLE_ANIM);
         }));
     }
@@ -306,7 +306,7 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
         super.appendHoverText(stack, level, components, flag);
     }
 
-    // Shift + right click = lock on (or cancel an active lock); plain right click = draw the bow like vanilla.
+    // Shift + left click = lock on (or cancel an active lock); plain right click = draw the bow like vanilla.
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
@@ -353,7 +353,7 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
 
         LivingEntity target = level.getEntitiesOfClass(LivingEntity.class,
                         player.getBoundingBox().inflate(SCAN_RADIUS),
-                        e -> e.isAlive() && isLockable(e))
+                        e -> e.isAlive() && isLockable(e, player))
                 .stream()
                 .max(Comparator.comparingDouble(LivingEntity::getHealth))
                 .orElse(null);
@@ -368,7 +368,8 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
         saveLockPos(tag, target.position());
         // No markActivated here -- the cooldown only starts once all locked shots are used.
 
-        target.addEffect(new MobEffectInstance(MobEffects.GLOWING, LOCK_GLOW_TICKS, 0));
+        // Outline only: no swirling effect particles, no HUD icon (ambient=false, visible=false, showIcon=false).
+        target.addEffect(new MobEffectInstance(MobEffects.GLOWING, LOCK_GLOW_TICKS, 0, false, false, false));
 
         // Ground marker that follows the target (removed again in clearLock).
         TyphonLockCircleEntity circle = new TyphonLockCircleEntity(level, target, player);
@@ -383,7 +384,11 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
 
         // Checked from NBT only, so client and server agree on which path this shot takes.
         if (!hasLock(stack)) {
-            super.releaseUsing(stack, level, shooter, timeLeft); // normal vanilla shot
+            // Normal vanilla shot, with the drawn time rescaled so vanilla's 20-tick full draw matches this
+            // shooter's attack-speed-scaled draw time.
+            int drawn = this.getUseDuration(stack) - timeLeft;
+            int scaled = Math.round(drawn * NORMAL_DRAW_TICKS / fullDrawTicks(stack, player));
+            super.releaseUsing(stack, level, shooter, this.getUseDuration(stack) - scaled);
             return;
         }
 
@@ -397,7 +402,7 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
         if (ammo.isEmpty() && !hasInfinity) return;
         if (ammo.isEmpty()) ammo = new ItemStack(Items.ARROW);
 
-        float power = drawPower(drawTicks, LOCKED_DRAW_TICKS);
+        float power = drawPower(drawTicks, fullDrawTicks(stack, player));
         if (power < 0.1F) return; // same "barely drawn" cutoff as vanilla
 
         // Infinity only covers plain arrows (ArrowItem.isInfinite), exactly like vanilla.
@@ -414,8 +419,7 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
             // = server PvP enabled AND team friendly-fire allows it (same rule vanilla arrows use). Horizontal distance check so the area is the circle, not a box.
             List<LivingEntity> area = serverLevel.getEntitiesOfClass(LivingEntity.class,
                     new AABB(center, center).inflate(SPLASH_RADIUS),
-                    e -> e != player && e.isAlive() && !e.isSpectator() && !(e instanceof ArmorStand)
-                            && (!(e instanceof Player other) || player.canHarmPlayer(other))
+                    e -> e.isAlive() && com.YqIl1.yqils_arknights.util.SkillTargeting.canSkillHit(player, e)
                             && horizontalDistanceSqr(e.position(), center) <= SPLASH_RADIUS * SPLASH_RADIUS);
             ArrowItem arrowItem = (ArrowItem) (ammo.getItem() instanceof ArrowItem ? ammo.getItem() : Items.ARROW);
             // Snapshot at fire time, same as the arrow's own damage being fixed when it's shot.
@@ -474,8 +478,11 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
         return Math.min((f * f + f * 2.0F) / 3.0F, 1.0F);
     }
 
-    private static float fullDrawTicks(ItemStack stack) {
-        return hasLock(stack) ? LOCKED_DRAW_TICKS : NORMAL_DRAW_TICKS;
+    // Ticks to full draw for this shooter: base (1 s, or 1.5 s during the skill) x 2.0 / attack speed.
+    private static float fullDrawTicks(ItemStack stack, net.minecraft.world.entity.LivingEntity shooter) {
+        float base = hasLock(stack) ? LOCKED_DRAW_TICKS : NORMAL_DRAW_TICKS;
+        double speed = com.YqIl1.yqils_arknights.util.SkillAttackSpeed.of(shooter); // capped at 4.0
+        return (float) (base * REFERENCE_ATTACK_SPEED / speed);
     }
 
     // Highest Y up to baseY + rise with a clear line from baseY. If a ceiling is in the way, spawn half a block
@@ -510,17 +517,10 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
         tag.putUUID(LOCK_CIRCLE_KEY, circle.getUUID());
     }
 
-    // Lock-on candidates: vanilla hostiles (Enemy) plus every creature from Torches Become Sunlight, except anything
-    // with an owner (that mod's partners and any tamed pet), so the skill never locks onto an ally.
-    private static boolean isLockable(LivingEntity e) {
-        if (e instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null) {
-            return false;
-        }
-        if (e instanceof Enemy) {
-            return true;
-        }
-        ResourceLocation id = ForgeRegistries.ENTITY_TYPES.getKey(e.getType());
-        return id != null && TORCHES_BECOME_SUNLIGHT_MODID.equals(id.getNamespace());
+    // Lock-on candidates: see SkillTargeting -- anything except the shooter, your own creatures, and other
+    // players / their creatures unless PvP allows it.
+    private static boolean isLockable(LivingEntity e, Player player) {
+        return com.YqIl1.yqils_arknights.util.SkillTargeting.canSkillHit(player, e);
     }
 
     private static double horizontalDistanceSqr(Vec3 a, Vec3 b) {
@@ -636,5 +636,11 @@ public class TyphonGreatbowItem extends BowItem implements CrosshairCounterItem,
     @Override
     public String getSkillLastUsedKey() {
         return SKILL_LAST_USED_KEY;
+    }
+
+    // Its skill puts no buff on the user, so the cooldown doesn't wait on any effect.
+    @Override
+    public boolean pausesWhileEffectActive() {
+        return false;
     }
 }
