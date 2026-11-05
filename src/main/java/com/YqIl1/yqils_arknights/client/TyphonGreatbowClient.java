@@ -21,7 +21,7 @@ public final class TyphonGreatbowClient {
     }
 
     // The player currently drawing this bow, or null.
-    public static AbstractClientPlayer drawer(ItemStack stack) {
+    public static net.minecraft.world.entity.player.Player drawer(ItemStack stack) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return null;
 
